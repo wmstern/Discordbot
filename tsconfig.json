@@ -21,7 +21,8 @@
     "lib": ["ESNext"],
     "target": "esnext",
     "useDefineForClassFields": true,
-    "pretty": true
+    "pretty": true,
+    "noEmit": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "__tests__"]
