@@ -1,5 +1,5 @@
-import { Client } from './client.ts';
 import { Events, type ClientEvents } from 'discord.js';
+import { Client } from './client.ts';
 
 export abstract class ClientEvent<
   T extends keyof ClientEvents = keyof ClientEvents

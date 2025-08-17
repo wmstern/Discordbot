@@ -1,7 +1,7 @@
 import { Client } from '#flamework';
-import config from './config.ts';
-import { join } from 'node:path';
 import { GatewayIntentBits } from 'discord.js';
+import { join } from 'node:path';
+import config from './config.ts';
 
 try {
   const client = new Client({

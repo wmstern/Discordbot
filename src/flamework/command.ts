@@ -1,10 +1,10 @@
-import { Client } from './client.ts';
 import {
-  type SlashCommandBuilder,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody,
+  type AutocompleteInteraction,
   type ChatInputCommandInteraction,
-  type AutocompleteInteraction
+  type RESTPostAPIChatInputApplicationCommandsJSONBody,
+  type SlashCommandBuilder
 } from 'discord.js';
+import { Client } from './client.ts';
 
 export abstract class Command {
   public readonly client: Client;

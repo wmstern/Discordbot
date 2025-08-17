@@ -1,17 +1,17 @@
-import { getExports } from './utils/files.ts';
 import {
-  Client as BaseClient,
-  Routes,
-  type ClientOptions,
-  type ClientEvents,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody,
-  ChatInputCommandInteraction,
   AutocompleteInteraction,
+  Client as BaseClient,
+  ChatInputCommandInteraction,
   MessageComponentInteraction,
-  ModalSubmitInteraction
+  ModalSubmitInteraction,
+  Routes,
+  type ClientEvents,
+  type ClientOptions,
+  type RESTPostAPIChatInputApplicationCommandsJSONBody
 } from 'discord.js';
-import { Command } from './command.ts';
 import { ClientEvent } from './client_event.ts';
+import { Command } from './command.ts';
+import { getExports } from './utils/files.ts';
 
 export class Client extends BaseClient {
   readonly #token: string;

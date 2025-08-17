@@ -1,5 +1,5 @@
 import { Command, type Client } from '#flamework';
-import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export default class PingCommand extends Command {
   path = import.meta.dirname;
