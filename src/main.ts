@@ -1,6 +1,5 @@
 import { Client } from '#flamework';
 import { GatewayIntentBits } from 'discord.js';
-import { join } from 'node:path';
 import config from './config.ts';
 
 try {
@@ -8,8 +7,8 @@ try {
     token: config.env.discordBotToken,
     clientId: config.env.discordClientId,
     dirs: {
-      events: join(import.meta.dirname, 'commands'),
-      commands: join(import.meta.dirname, 'events')
+      events: config.dirs.events,
+      commands: config.dirs.commands
     },
     intents: [GatewayIntentBits.Guilds],
     allowedMentions: {
