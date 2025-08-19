@@ -4,6 +4,7 @@ import {
   ChatInputCommandInteraction,
   MessageComponentInteraction,
   ModalSubmitInteraction,
+  REST,
   Routes,
   type ClientEvents,
   type ClientOptions,
@@ -16,6 +17,7 @@ import { getExports } from './utils/files.ts';
 export class Client extends BaseClient {
   readonly #token: string;
   readonly #clientId: string;
+  readonly #rest: REST;
   readonly dirs: DirsOptions;
 
   public readonly commands = new Map<string, AnyCommand>();
@@ -26,6 +28,8 @@ export class Client extends BaseClient {
     this.#token = token;
     this.#clientId = clientId;
     this.dirs = dirs;
+
+    this.#rest = new REST().setToken(token);
 
     this.on('interactionCreate', (i) => void this.#handleInteractions(i));
   }
@@ -80,15 +84,39 @@ export class Client extends BaseClient {
   }
 
   async registerCommands() {
-    const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+    const commands: CommandsDatas = { global: [] };
 
-    for (const [, { data }] of this.commands) {
-      commands.push(data);
+    for (const [, cmd] of this.commands) {
+      if (cmd.guild) {
+        (commands[cmd.guild] ??= []).push(cmd.data);
+      }
+      commands.global.push(cmd.data);
     }
 
-    await this.rest.put(Routes.applicationCommands(this.#clientId), {
+    for (const key of Object.keys(commands)) {
+      if (key === 'global') await this.registerGlobalCommands(commands[key]);
+      else await this.registerGuildCommands(key, commands[key]);
+    }
+  }
+
+  async registerGlobalCommands(
+    commands: RESTPostAPIChatInputApplicationCommandsJSONBody[]
+  ) {
+    await this.#rest.put(Routes.applicationCommands(this.#clientId), {
       body: commands
     });
+  }
+
+  async registerGuildCommands(
+    guild: string,
+    commands: RESTPostAPIChatInputApplicationCommandsJSONBody[]
+  ) {
+    await this.#rest.put(
+      Routes.applicationGuildCommands(this.#clientId, guild),
+      {
+        body: commands
+      }
+    );
   }
 
   login() {
@@ -143,6 +171,11 @@ interface Options extends ClientOptions {
   clientId: string;
   dirs: DirsOptions;
 }
+
+type CommandsDatas = Record<
+  string,
+  RESTPostAPIChatInputApplicationCommandsJSONBody[]
+>;
 
 export type AnyCommandConstructor = new (client: Client) => Command;
 export type AnyCommand = InstanceType<AnyCommandConstructor>;

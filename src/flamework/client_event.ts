@@ -1,4 +1,4 @@
-import { Events, type ClientEvents } from 'discord.js';
+import { type ClientEvents } from 'discord.js';
 import { Client } from './client.ts';
 
 export abstract class ClientEvent<
@@ -11,7 +11,6 @@ export abstract class ClientEvent<
   constructor(client: Client, opts: ClientEventOptions<T>) {
     this.client = client;
     if (opts.once) this.once = opts.once;
-    if (!(opts.name in Events)) throw new Error(`invalid name: ${opts.name}`);
     this.name = opts.name;
   }
 

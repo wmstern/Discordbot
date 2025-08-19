@@ -2,15 +2,17 @@ import {
   type AutocompleteInteraction,
   type ChatInputCommandInteraction,
   type RESTPostAPIChatInputApplicationCommandsJSONBody,
-  type SlashCommandBuilder
+  type SlashCommandBuilder,
+  type SlashCommandOptionsOnlyBuilder
 } from 'discord.js';
 import { Client } from './client.ts';
 
 export abstract class Command {
   public readonly client: Client;
 
-  public readonly builder: SlashCommandBuilder;
+  public readonly builder: CommandBuilder;
   public readonly data: RESTPostAPIChatInputApplicationCommandsJSONBody;
+  public readonly guild?: string;
 
   abstract path: string;
 
@@ -18,7 +20,7 @@ export abstract class Command {
   public cooldown = 3e3;
   public readonly cooldowns = new Map<string, CooldownObject>();
 
-  constructor(client: Client, builder: SlashCommandBuilder) {
+  constructor(client: Client, builder: CommandBuilder) {
     this.client = client;
     this.builder = builder;
     this.data = builder.toJSON();
@@ -81,6 +83,10 @@ export abstract class Command {
     return content;
   }
 }
+
+export type CommandBuilder =
+  | SlashCommandBuilder
+  | SlashCommandOptionsOnlyBuilder;
 
 export interface CooldownObject {
   userId: string;
