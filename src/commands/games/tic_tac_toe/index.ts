@@ -4,9 +4,9 @@ import {
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from 'discord.js';
-import { difficulties } from '../../utils/bots/tic_tac_toe.ts';
-import createCollector from '../../utils/collectors/tic_tac_toe.ts';
-import createGame from '../../utils/games/tic_tac_toe.ts';
+import createCollector from './_collector.ts';
+import GameLogic from './_logic.ts';
+import { Difficulties } from './_types.ts';
 
 export default class TicTacToeCommand extends Command {
   path = import.meta.dirname;
@@ -31,7 +31,7 @@ export default class TicTacToeCommand extends Command {
               'Escoge la dificultad contra la que jugaras contra el bot.'
             )
             .setChoices(
-              Object.values(difficulties).map((v) => ({ name: v, value: v }))
+              Object.values(Difficulties).map((v) => ({ name: v, value: v }))
             )
             .setRequired(false)
         )
@@ -54,13 +54,13 @@ export default class TicTacToeCommand extends Command {
     this.games.add(channel);
 
     const player1 = i.user;
-    const player2 = i.options.getUser('adversary', false) ?? i.client.user;
+    const player2 = i.options.getUser('adversario', false) ?? i.client.user;
     const difficulty =
       (i.options.getString('dificultad', false) as
-        | (typeof difficulties)[keyof typeof difficulties]
-        | undefined) ?? difficulties.MEDIUM;
+        | (typeof Difficulties)[keyof typeof Difficulties]
+        | undefined) ?? Difficulties.MEDIUM;
 
-    const game = new createGame(player1, player2, difficulty);
+    const game = new GameLogic(player1, player2, difficulty);
 
     const msg = await i.editReply({
       content: `Turno de ${game.currentPlayer.username}`,

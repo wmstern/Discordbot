@@ -3,17 +3,13 @@ import {
   type ButtonInteraction,
   type Message
 } from 'discord.js';
-import type Command from '../../commands/games/tic_tac_toe.ts';
-import type TicTacToeGame from '../games/tic_tac_toe.ts';
-
-const EndReasons = {
-  WIN: 'win',
-  TIE: 'tie'
-} as const;
+import type GameLogic from './_logic.ts';
+import { EndReasons } from './_types.ts';
+import type Command from './index.ts';
 
 export default function createCollector(
   msg: Message,
-  game: TicTacToeGame,
+  game: GameLogic,
   command: Command
 ) {
   const collector = msg.createMessageComponentCollector({

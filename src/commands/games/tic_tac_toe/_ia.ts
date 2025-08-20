@@ -1,32 +1,27 @@
-import createGame from '../games/tic_tac_toe.ts';
+import GameLogic from './_logic.ts';
+import { Difficulties } from './_types.ts';
 
-export const difficulties = {
-  EASY: 'easy',
-  MEDIUM: 'medium',
-  HARD: 'hard'
-} as const;
+export default class GameIA {
+  public readonly game: GameLogic;
+  public readonly difficulty: (typeof Difficulties)[keyof typeof Difficulties];
 
-export default class createBot {
-  public readonly game: createGame;
-  public readonly difficulty: (typeof difficulties)[keyof typeof difficulties];
-
-  constructor(game: createGame, difficulty: typeof this.difficulty) {
+  constructor(game: GameLogic, Difficulty: typeof this.difficulty) {
     this.game = game;
-    this.difficulty = difficulty;
+    this.difficulty = Difficulty;
   }
 
   move() {
     switch (this.difficulty) {
-      case difficulties.EASY:
+      case Difficulties.EASY:
         return this.easyMove(this.game);
-      case difficulties.MEDIUM:
+      case Difficulties.MEDIUM:
         return this.mediumMove(this.game);
-      case difficulties.HARD:
+      case Difficulties.HARD:
         return this.hardMove(this.game);
     }
   }
 
-  easyMove(game: createGame) {
+  easyMove(game: GameLogic) {
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return null;
     const choice = freeCells[Math.floor(Math.random() * freeCells.length)];
@@ -34,7 +29,7 @@ export default class createBot {
     return choice;
   }
 
-  mediumMove(game: createGame) {
+  mediumMove(game: GameLogic) {
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return null;
 
@@ -58,7 +53,7 @@ export default class createBot {
     return choice;
   }
 
-  hardMove(game: createGame) {
+  hardMove(game: GameLogic) {
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return null;
 
@@ -79,7 +74,7 @@ export default class createBot {
     return bestMove;
   }
 
-  private minimax(game: createGame, isBot: boolean): number {
+  private minimax(game: GameLogic, isBot: boolean): number {
     if (game.checkWin()) return isBot ? -1 : 1;
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return 0;

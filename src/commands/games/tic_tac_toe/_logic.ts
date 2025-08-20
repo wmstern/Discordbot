@@ -1,13 +1,12 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
-import createBot from '../bots/tic_tac_toe.ts';
+import GameIA from './_ia.ts';
+import { Board, Emojis, Line } from './_types.ts';
 
-export const EMOJIS = ['▪️', '❌️', '⭕️'] as const;
-
-export default class createGame {
+export default class GameLogic {
   public readonly player1: User;
   public readonly player2: User;
 
-  public readonly bot?: createBot;
+  public readonly bot?: GameIA;
 
   turn: 0 | 1;
   winner?: User;
@@ -21,13 +20,13 @@ export default class createGame {
   constructor(
     player1: User,
     player2: User,
-    difficulty: typeof createBot.prototype.difficulty
+    difficulty: typeof GameIA.prototype.difficulty
   ) {
     this.player1 = player1;
     this.player2 = player2;
     if (player2.bot) {
       this.turn = 0;
-      this.bot = new createBot(this, difficulty);
+      this.bot = new GameIA(this, difficulty);
     } else this.turn = Math.floor(Math.random() * 2) as 0 | 1;
   }
 
@@ -97,7 +96,7 @@ export default class createGame {
         ...row.map((cell, x) =>
           new ButtonBuilder()
             .setStyle(2)
-            .setLabel(EMOJIS[cell])
+            .setLabel(Emojis[cell])
             .setCustomId(`tic-tac-toe_${x.toString()}_${y.toString()}`)
             .setDisabled(ended || cell !== 0)
         )
@@ -105,7 +104,3 @@ export default class createGame {
     );
   }
 }
-
-type EmojiN = 0 | 1 | 2;
-type Line = [EmojiN, EmojiN, EmojiN];
-type Board = [Line, Line, Line];
