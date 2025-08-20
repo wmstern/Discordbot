@@ -1,10 +1,13 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
+import createBot from '../bots/tic_tac_toe.ts';
 
 export const EMOJIS = ['▪️', '❌️', '⭕️'] as const;
 
 export default class createGame {
   public readonly player1: User;
   public readonly player2: User;
+
+  public readonly bot?: createBot;
 
   turn: 0 | 1;
   winner?: User;
@@ -15,11 +18,17 @@ export default class createGame {
     [0, 0, 0]
   ];
 
-  constructor(player1: User, player2: User) {
+  constructor(
+    player1: User,
+    player2: User,
+    difficulty: typeof createBot.prototype.difficulty
+  ) {
     this.player1 = player1;
     this.player2 = player2;
-    if (player2.bot) this.turn = 0;
-    else this.turn = Math.floor(Math.random() * 2) as 0 | 1;
+    if (player2.bot) {
+      this.turn = 0;
+      this.bot = new createBot(this, difficulty);
+    } else this.turn = Math.floor(Math.random() * 2) as 0 | 1;
   }
 
   get currentPlayer(): User {
@@ -28,6 +37,22 @@ export default class createGame {
 
   get winnerPlayer(): User | undefined {
     return this.winner;
+  }
+
+  get lines(): Line[] {
+    const b = this.board;
+    return [
+      [b[0][0], b[0][1], b[0][2]],
+      [b[1][0], b[1][1], b[1][2]],
+      [b[2][0], b[2][1], b[2][2]],
+
+      [b[0][0], b[1][0], b[2][0]],
+      [b[0][1], b[1][1], b[2][1]],
+      [b[0][2], b[1][2], b[2][2]],
+
+      [b[0][0], b[1][1], b[2][2]],
+      [b[0][2], b[1][1], b[2][0]]
+    ];
   }
 
   placeMarker(x: number, y: number): boolean {
@@ -41,19 +66,7 @@ export default class createGame {
   }
 
   checkWin(): boolean {
-    const b = this.board;
-    const lines: Line[] = [
-      [b[0][0], b[0][1], b[0][2]],
-      [b[1][0], b[1][1], b[1][2]],
-      [b[2][0], b[2][1], b[2][2]],
-
-      [b[0][0], b[1][0], b[2][0]],
-      [b[0][1], b[1][1], b[2][1]],
-      [b[0][2], b[1][2], b[2][2]],
-
-      [b[0][0], b[1][1], b[2][2]],
-      [b[0][2], b[1][1], b[2][0]]
-    ];
+    const lines = this.lines;
 
     for (const line of lines) {
       if (line[0] !== 0 && line.every((v) => v === line[0])) {
@@ -72,6 +85,12 @@ export default class createGame {
     return undefined;
   }
 
+  getFreeCells(): { x: number; y: number }[] {
+    return this.board
+      .flatMap((row, y) => row.map((cell, x) => (cell === 0 ? { y, x } : null)))
+      .filter((v) => v !== null);
+  }
+
   renderBoard(ended = false): ActionRowBuilder<ButtonBuilder>[] {
     return this.board.map((row, y) =>
       new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -84,19 +103,6 @@ export default class createGame {
         )
       )
     );
-  }
-
-  botMove(): { x: number; y: number } | null {
-    const freeCells: { x: number; y: number }[] = [];
-    this.board.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        if (cell === 0) freeCells.push({ x, y });
-      });
-    });
-    if (freeCells.length === 0) return null;
-    const choice = freeCells[Math.floor(Math.random() * freeCells.length)];
-    this.board[choice.y][choice.x] = 2;
-    return choice;
   }
 }
 

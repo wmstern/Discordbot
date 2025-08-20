@@ -4,6 +4,7 @@ import {
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from 'discord.js';
+import { difficulties } from '../../utils/bots/tic_tac_toe.ts';
 import createCollector from '../../utils/collectors/tic_tac_toe.ts';
 import createGame from '../../utils/games/tic_tac_toe.ts';
 
@@ -16,11 +17,22 @@ export default class TicTacToeCommand extends Command {
       client,
       new SlashCommandBuilder()
         .setName('tic_tac_toe')
-        .setDescription('tic tac toe game')
+        .setDescription('El clasico juego tic tac toe.')
         .addUserOption((opt) =>
           opt
-            .setName('adversary')
-            .setDescription('The second player.')
+            .setName('adversario')
+            .setDescription('El segundo jugador.')
+            .setRequired(false)
+        )
+        .addStringOption((opt) =>
+          opt
+            .setName('dificultad')
+            .setDescription(
+              'Escoge la dificultad contra la que jugaras contra el bot.'
+            )
+            .setChoices(
+              Object.values(difficulties).map((v) => ({ name: v, value: v }))
+            )
             .setRequired(false)
         )
     );
@@ -31,7 +43,7 @@ export default class TicTacToeCommand extends Command {
 
     if (this.games.has(channel)) {
       await i.reply({
-        content: `There is already an active game on this server.`,
+        content: 'Ya hay una partida activa en este canal.',
         flags: MessageFlags.Ephemeral
       });
       return;
@@ -43,8 +55,12 @@ export default class TicTacToeCommand extends Command {
 
     const player1 = i.user;
     const player2 = i.options.getUser('adversary', false) ?? i.client.user;
+    const difficulty =
+      (i.options.getString('dificultad', false) as
+        | (typeof difficulties)[keyof typeof difficulties]
+        | undefined) ?? difficulties.MEDIUM;
 
-    const game = new createGame(player1, player2);
+    const game = new createGame(player1, player2, difficulty);
 
     const msg = await i.editReply({
       content: `Turno de ${game.currentPlayer.username}`,

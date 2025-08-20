@@ -31,7 +31,7 @@ export default function createCollector(
     const placed = game.placeMarker(x, y);
     if (!placed) return;
 
-    if (game.player2.bot) game.botMove();
+    if (game.bot) game.bot.move();
     else game.nextTurn();
 
     const ended = game.checkWin();
