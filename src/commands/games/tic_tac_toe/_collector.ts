@@ -1,7 +1,8 @@
 import {
   ComponentType,
   type ButtonInteraction,
-  type Message
+  type Message,
+  type ReadonlyCollection
 } from 'discord.js';
 import type GameLogic from './_logic.ts';
 import { EndReasons } from './_types.ts';
@@ -19,46 +20,51 @@ export default function createCollector(
 
   const handleCollect = async (i: ButtonInteraction) => {
     if (i.user.id !== game.currentPlayer.id) return;
+    await i.deferUpdate();
 
     const [, xStr, yStr] = i.customId.split('_');
     const x = parseInt(xStr);
     const y = parseInt(yStr);
 
-    const placed = game.placeMarker(x, y);
-    if (!placed) return;
+    const response = game.playMove(x, y);
+    if (!response.placed) return;
 
-    if (game.bot) game.bot.move();
-    else game.nextTurn();
-
-    const ended = game.checkWin();
-
-    if (!ended && game.board.every((list) => list.every((n) => n !== 0))) {
-      collector.stop(EndReasons.TIE);
+    if (response.ended) {
+      collector.stop(response.endReason);
       return;
     }
 
-    if (ended) {
-      collector.stop(EndReasons.WIN);
-    }
-
-    await i.update({
-      content: ended
-        ? `🎉 Ganador: ${game.winnerPlayer?.username ?? ''}`
-        : `Turno de ${game.currentPlayer.username}`,
-      components: game.renderBoard(ended)
+    await i.editReply({
+      content: `Turno de ${game.currentPlayer.username}`,
+      components: game.renderBoard(false)
     });
   };
 
-  const handleEnd = async (reason: string) => {
+  const handleEnd = async (
+    collected: ReadonlyCollection<string, ButtonInteraction>,
+    reason: string
+  ) => {
     command.games.delete(msg.channelId);
 
-    if (reason !== EndReasons.WIN)
-      await msg.edit({
-        content: 'tie...',
+    const i = collected.last();
+
+    if (reason === EndReasons.WIN)
+      await i?.editReply({
+        content: `ganador: ${game.winnerPlayer?.username ?? ''}`,
+        components: game.renderBoard(true)
+      });
+    else if (reason === EndReasons.TIE)
+      await i?.editReply({
+        content: 'empate...',
+        components: game.renderBoard(true)
+      });
+    else
+      await i?.editReply({
+        content: 'tardaron mucho en escoger.',
         components: game.renderBoard(true)
       });
   };
 
   collector.on('collect', (i) => void handleCollect(i));
-  collector.on('end', (_ic, reason) => void handleEnd(reason));
+  collector.on('end', (collected, reason) => void handleEnd(collected, reason));
 }

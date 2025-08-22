@@ -89,6 +89,7 @@ export class Client extends BaseClient {
     for (const [, cmd] of this.commands) {
       if (cmd.guild) {
         (commands[cmd.guild] ??= []).push(cmd.data);
+        continue;
       }
       commands.global.push(cmd.data);
     }

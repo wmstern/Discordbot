@@ -1,6 +1,13 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
 import GameIA from './_ia.ts';
-import { Board, Emojis, Line } from './_types.ts';
+import {
+  Board,
+  Emojis,
+  EndReasons,
+  Line,
+  type Difficulties,
+  type Response
+} from './_types.ts';
 
 export default class GameLogic {
   public readonly player1: User;
@@ -17,11 +24,7 @@ export default class GameLogic {
     [0, 0, 0]
   ];
 
-  constructor(
-    player1: User,
-    player2: User,
-    difficulty: typeof GameIA.prototype.difficulty
-  ) {
+  constructor(player1: User, player2: User, difficulty: Difficulties) {
     this.player1 = player1;
     this.player2 = player2;
     if (player2.bot) {
@@ -52,6 +55,33 @@ export default class GameLogic {
       [b[0][0], b[1][1], b[2][2]],
       [b[0][2], b[1][1], b[2][0]]
     ];
+  }
+
+  playMove(x: number, y: number): Response {
+    const placed = this.placeMarker(x, y);
+
+    let endReason: EndReasons | undefined;
+    if (this.checkWin()) endReason = EndReasons.WIN;
+    if (this.board.every((row) => row.every((cell) => cell !== 0)))
+      endReason = EndReasons.TIE;
+
+    if (!endReason && placed) {
+      if (this.bot) {
+        this.bot.move();
+        if (this.checkWin()) endReason = EndReasons.WIN;
+        if (this.board.every((row) => row.every((cell) => cell !== 0)))
+          endReason = EndReasons.TIE;
+      } else this.nextTurn();
+    }
+
+    let ended = false;
+    if (endReason) ended = true;
+
+    return {
+      placed,
+      ended,
+      endReason
+    };
   }
 
   placeMarker(x: number, y: number): boolean {

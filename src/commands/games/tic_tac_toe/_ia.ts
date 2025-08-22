@@ -3,9 +3,9 @@ import { Difficulties } from './_types.ts';
 
 export default class GameIA {
   public readonly game: GameLogic;
-  public readonly difficulty: (typeof Difficulties)[keyof typeof Difficulties];
+  public readonly difficulty: Difficulties;
 
-  constructor(game: GameLogic, Difficulty: typeof this.difficulty) {
+  constructor(game: GameLogic, Difficulty: Difficulties) {
     this.game = game;
     this.difficulty = Difficulty;
   }

@@ -56,15 +56,14 @@ export default class TicTacToeCommand extends Command {
     const player1 = i.user;
     const player2 = i.options.getUser('adversario', false) ?? i.client.user;
     const difficulty =
-      (i.options.getString('dificultad', false) as
-        | (typeof Difficulties)[keyof typeof Difficulties]
-        | undefined) ?? Difficulties.MEDIUM;
+      (i.options.getString('dificultad', false) as Difficulties | undefined) ??
+      Difficulties.MEDIUM;
 
     const game = new GameLogic(player1, player2, difficulty);
 
     const msg = await i.editReply({
       content: `Turno de ${game.currentPlayer.username}`,
-      components: game.renderBoard()
+      components: game.renderBoard(false)
     });
 
     createCollector(msg, game, this);

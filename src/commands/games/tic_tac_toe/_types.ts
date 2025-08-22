@@ -18,3 +18,12 @@ export const Difficulties = {
 export type Board = [Line, Line, Line];
 export type EmojisKeys = 0 | 1 | 2;
 export type Line = [EmojisKeys, EmojisKeys, EmojisKeys];
+
+export type EndReasons = (typeof EndReasons)[keyof typeof EndReasons];
+export type Difficulties = (typeof Difficulties)[keyof typeof Difficulties];
+
+export interface Response {
+  placed: boolean;
+  ended: boolean;
+  endReason?: EndReasons;
+}
