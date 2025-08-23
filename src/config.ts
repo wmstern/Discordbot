@@ -1,12 +1,6 @@
-import { join } from 'node:path';
-
-const devMode = process.env.DEV === 'true';
-
 const developers = (process.env.DEVELOPERS ?? '').split(',');
 
-const discordBotToken = devMode
-  ? process.env.DEV_DISCORD_BOT_TOKEN
-  : process.env.DISCORD_BOT_TOKEN;
+const discordBotToken = process.env.DISCORD_BOT_TOKEN;
 
 if (!discordBotToken) throw new Error('require discord bot token');
 
@@ -18,14 +12,9 @@ if (!discordClientId || !discordGuildId)
 
 export default Object.freeze({
   env: Object.freeze({
-    devMode,
     developers,
     discordBotToken,
     discordClientId,
     discordGuildId
-  }),
-  dirs: Object.freeze({
-    commands: join(import.meta.dirname, 'commands'),
-    events: join(import.meta.dirname, 'events')
   })
 });

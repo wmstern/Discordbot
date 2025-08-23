@@ -24,6 +24,6 @@
     "pretty": true,
     "noEmit": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/events/commands/block.ts"],
   "exclude": ["node_modules", "dist", "__tests__"]
 }

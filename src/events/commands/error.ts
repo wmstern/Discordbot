@@ -1,17 +1,12 @@
-import { ClientEvent, type Client } from '#flamework';
 import {
   MessageFlags,
   type ChatInputCommandInteraction,
   type InteractionReplyOptions
 } from 'discord.js';
+import { Event, EventBase } from '#framework';
 
-export default class CommandErrorEvent extends ClientEvent<'commandError'> {
-  constructor(client: Client) {
-    super(client, {
-      name: 'commandError'
-    });
-  }
-
+@Event('commandError')
+export class CommandErrorEvent extends EventBase {
   async run(i: ChatInputCommandInteraction, err: Error) {
     console.error(err);
 

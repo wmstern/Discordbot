@@ -4,9 +4,9 @@ import {
   type Message,
   type ReadonlyCollection
 } from 'discord.js';
-import type GameLogic from './_logic.ts';
-import { EndReasons } from './_types.ts';
-import type Command from './index.ts';
+import type { TTTCommand as Command } from './command.ts';
+import type GameLogic from './logic.ts';
+import { EndReasons } from './types.ts';
 
 export default function createCollector(
   msg: Message,

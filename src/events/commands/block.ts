@@ -1,13 +1,8 @@
-import { ClientEvent, type Client, type CooldownObject } from '#flamework';
 import { MessageFlags, type ChatInputCommandInteraction } from 'discord.js';
+import { Event, EventBase, type CooldownObject } from '#framework';
 
-export default class CommandBlockEvent extends ClientEvent<'commandBlock'> {
-  constructor(client: Client) {
-    super(client, {
-      name: 'commandBlock'
-    });
-  }
-
+@Event('commandBlock')
+export class CommandBlockEvent extends EventBase {
   async run(i: ChatInputCommandInteraction, reason: string, content: unknown) {
     if (reason === 'cooldown') {
       const cooldown = content as CooldownObject;

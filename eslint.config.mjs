@@ -21,6 +21,14 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
         project: 'tsconfig.eslint.json'
       }
+    },
+    rules: {
+      '@typescript-eslint/no-extraneous-class': [
+        'error',
+        {
+          allowWithDecorator: true
+        }
+      ]
     }
   }
 ]);

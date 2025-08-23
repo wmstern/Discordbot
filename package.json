@@ -38,9 +38,10 @@
     "vitest": "3.2.4"
   },
   "dependencies": {
-    "discord.js": "14.21.0"
+    "discord.js": "14.21.0",
+    "reflect-metadata": "^0.2.2"
   },
   "imports": {
-    "#flamework": "./src/flamework/mod.ts"
+    "#framework": "./src/framework/module.ts"
   }
 }

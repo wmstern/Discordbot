@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
-import GameIA from './_ia.ts';
+import GameIA from './ia.ts';
 import {
   Board,
   Emojis,
@@ -7,7 +7,7 @@ import {
   Line,
   type Difficulties,
   type Response
-} from './_types.ts';
+} from './types.ts';
 
 export default class GameLogic {
   public readonly player1: User;
