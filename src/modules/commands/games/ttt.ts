@@ -1,16 +1,15 @@
-import { Command, CommandBase } from '#framework';
+import { Command, CommandBase, Cooldown } from '#framework';
 import {
   MessageFlags,
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from 'discord.js';
-import createCollector from './collector.ts';
-import GameLogic from './logic.ts';
-import { Difficulties } from './types.ts';
+import { TTTCollector } from '../../services/ttt/collector.ts';
+import GameLogic from '../../services/ttt/logic.ts';
+import { Difficulties } from '../../types/ttt.types.ts';
 
-@Command('tic_tac_toe', { path: import.meta.dirname })
-export class TTTCommand extends CommandBase {
-  data = new SlashCommandBuilder()
+@Command(
+  new SlashCommandBuilder()
     .setName('tic_tac_toe')
     .setDescription('El clasico juego tic tac toe.')
     .addUserOption((opt) =>
@@ -29,10 +28,13 @@ export class TTTCommand extends CommandBase {
           Object.values(Difficulties).map((v) => ({ name: v, value: v }))
         )
         .setRequired(false)
-    );
-  cooldown = 6e3;
+    )
+)
+export class TTTCommand extends CommandBase {
   games = new Set<string>();
+  private collector: TTTCollector = new TTTCollector();
 
+  @Cooldown(12000)
   async run(i: ChatInputCommandInteraction) {
     const channel = i.channel?.id ?? '';
 
@@ -61,6 +63,6 @@ export class TTTCommand extends CommandBase {
       components: game.renderBoard(false)
     });
 
-    createCollector(msg, game, this);
+    this.collector.create(msg, game, this);
   }
 }

@@ -9,28 +9,35 @@ import {
   type ClientEvents,
   type RESTPostAPIChatInputApplicationCommandsJSONBody
 } from 'discord.js';
+import { join } from 'node:path';
 import 'reflect-metadata';
-import { CommandBase } from './command_base.ts';
-import { EventBase } from './event_base.ts';
-import { collectMetadata } from './utils/module_loader.ts';
+import { CommandBase } from './bases/command.ts';
+import { EventBase } from './bases/event.ts';
+import { getExports } from './utils/files.ts';
 
 export const FrameworkFactory = {
-  create(rootModule: new () => object, options: ClientOptions) {
+  async create(path: string, options: ClientOptions) {
     const client = new Client(options);
 
     const acc: {
       commands: (new () => CommandBase)[];
       events: (new () => EventBase)[];
-    } = { commands: [], events: [] };
-    collectMetadata(rootModule, acc);
-    const { commands, events } = acc;
+    } = {
+      commands: await getExports<new () => CommandBase>(join(path, 'commands')),
+      events: await getExports<new () => EventBase>(join(path, 'events'))
+    };
 
     const commandMap = new Collection<string, CommandBase>();
+    const commandData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
-    for (const Cmd of commands) {
+    for (const Cmd of acc.commands) {
       const instance = new Cmd();
-      const name = Reflect.getMetadata('command:name', Cmd) as string;
-      commandMap.set(name, instance);
+      const data = Reflect.getMetadata(
+        'command:data',
+        Cmd
+      ) as RESTPostAPIChatInputApplicationCommandsJSONBody;
+      commandMap.set(data.name, instance);
+      commandData.push(data);
     }
 
     const handleInteraction = async (interaction: unknown) => {
@@ -51,29 +58,25 @@ export const FrameworkFactory = {
 
     client.on('interactionCreate', (i) => void handleInteraction(i));
 
-    for (const Ev of events) {
+    for (const Ev of acc.events) {
+      const instance = new Ev();
       const eventName = Reflect.getMetadata(
         'event:name',
         Ev
       ) as keyof ClientEvents;
-      const instance = new Ev();
       client.on(eventName, (...args) => instance.run(...args));
     }
 
     return {
-      async sync(token: string, id: string) {
-        const rest = new REST().setToken(token);
-
-        const slashData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-        for (const [, cmd] of commandMap) {
-          slashData.push(cmd.toJSON());
-        }
-
+      client,
+      acc,
+      commandMap,
+      commandData,
+      async listen(token: string, id: string) {
+        const rest = new REST({ version: '10' }).setToken(token);
         await rest.put(Routes.applicationCommands(id), {
-          body: slashData
+          body: commandData
         });
-      },
-      async login(token: string) {
         await client.login(token);
       }
     };

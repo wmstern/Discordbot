@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { EventBase } from '../event_base.ts';
+import { EventBase } from '../bases/event.ts';
 
 export function Event(eventName: string) {
   return (target: new () => EventBase) => {

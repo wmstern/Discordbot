@@ -31,11 +31,12 @@ export async function getExports<T>(dir: string): Promise<T[]> {
   const filePaths = await getFiles(dir);
   const modules = await Promise.all(
     filePaths.map(async (file) => {
-      const { default: exp } = (await import(pathToFileURL(file).href)) as {
-        default: T;
-      };
-      return exp;
+      const module = (await import(pathToFileURL(file).href)) as Record<
+        string,
+        T
+      >;
+      return Object.values(module);
     })
   );
-  return modules;
+  return modules.flat();
 }

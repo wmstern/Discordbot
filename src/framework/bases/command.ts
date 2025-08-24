@@ -4,12 +4,12 @@ import {
   type SlashCommandBuilder,
   type SlashCommandOptionsOnlyBuilder
 } from 'discord.js';
+import 'reflect-metadata';
 
 export abstract class CommandBase {
-  abstract data: CommandBuilder;
-  abstract cooldown: number;
+  cooldown = 3e3;
 
-  private cooldowns = new Map<string, CooldownObject>();
+  cooldowns = new Map<string, CooldownObject>();
 
   abstract run(interaction: ChatInputCommandInteraction): unknown;
   autocomplete?(interaction: AutocompleteInteraction): unknown;
@@ -30,20 +30,35 @@ export abstract class CommandBase {
 
   async execute(interaction: ChatInputCommandInteraction) {
     try {
-      if (this.cooldowns.has(interaction.user.id)) {
-        await this.onBlock(
-          interaction,
-          'cooldown',
-          this.cooldowns.get(interaction.user.id)
-        );
-        return;
+      const cooldown = Reflect.getMetadata(
+        'command:cooldown',
+        this,
+        'run'
+      ) as number;
+      if (cooldown) {
+        if (this.cooldowns.has(interaction.user.id)) {
+          await this.onBlock(
+            interaction,
+            'cooldown',
+            this.cooldowns.get(interaction.user.id)
+          );
+          return;
+        } else {
+          this.cooldowns.set(interaction.user.id, {
+            userId: interaction.user.id,
+            start: Date.now(),
+            time: cooldown,
+            fn: setTimeout(
+              () => this.cooldowns.delete(interaction.user.id),
+              cooldown
+            )
+          });
+        }
       }
 
       await this.run(interaction);
     } catch (err) {
-      void this.onError(interaction, err as Error);
-    } finally {
-      this.addCooldown(interaction.user.id);
+      await this.onError(interaction, err as Error);
     }
   }
 
@@ -53,23 +68,6 @@ export abstract class CommandBase {
     } catch (err) {
       interaction.client.emit('error', err as Error);
     }
-  }
-
-  addCooldown(userId: string): CooldownObject {
-    const content: CooldownObject = {
-      userId,
-      time: this.cooldown,
-      start: Date.now(),
-      fn: setTimeout(() => this.cooldowns.delete(userId), this.cooldown)
-    };
-
-    this.cooldowns.set(userId, content);
-
-    return content;
-  }
-
-  toJSON() {
-    return this.data.toJSON();
   }
 }
 

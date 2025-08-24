@@ -1,3 +1,4 @@
+/**
 import { Event, EventBase } from '#framework';
 
 @Event('debug')
@@ -6,3 +7,4 @@ export class DebugEvent extends EventBase {
     console.debug(msg);
   }
 }
+*/
