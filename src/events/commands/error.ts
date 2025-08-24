@@ -1,14 +1,15 @@
+import { Event, EventBase } from '#framework';
 import {
   MessageFlags,
   type ChatInputCommandInteraction,
   type InteractionReplyOptions
 } from 'discord.js';
-import { Event, EventBase } from '#framework';
+import { logger } from '../../common/logger.ts';
 
 @Event('commandError')
 export class CommandErrorEvent extends EventBase {
   async run(i: ChatInputCommandInteraction, err: Error) {
-    console.error(err);
+    logger.error(err);
 
     const content: InteractionReplyOptions = {
       content: 'There was an error while executing this command.',

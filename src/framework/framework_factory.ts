@@ -17,7 +17,7 @@ import { getExports } from './utils/files.ts';
 
 export const FrameworkFactory = {
   async create(path: string, options: ClientOptions) {
-    const client = new Client(options);
+    const client = createClient(options);
 
     const acc: {
       commands: (new () => CommandBase)[];
@@ -69,7 +69,6 @@ export const FrameworkFactory = {
 
     return {
       client,
-      acc,
       commandMap,
       commandData,
       async listen(token: string, id: string) {
@@ -82,3 +81,7 @@ export const FrameworkFactory = {
     };
   }
 };
+
+function createClient(opts: ClientOptions): Client {
+  return new Client(opts);
+}

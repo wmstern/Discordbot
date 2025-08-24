@@ -1,11 +1,11 @@
-import { Command, CommandBase, Cooldown } from '#framework';
+import { Command, CommandBase, Cooldown, DeferReply } from '#framework';
 import {
   MessageFlags,
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from 'discord.js';
-import { TTTCollector } from '../../services/ttt/collector.ts';
-import GameLogic from '../../services/ttt/logic.ts';
+import { TTTCollector } from '../../services/tic_tac_toe/collector.ts';
+import GameLogic from '../../services/tic_tac_toe/logic.ts';
 import { Difficulties } from '../../types/ttt.types.ts';
 
 @Command(
@@ -34,19 +34,18 @@ export class TTTCommand extends CommandBase {
   games = new Set<string>();
   private collector: TTTCollector = new TTTCollector();
 
+  @DeferReply(true)
   @Cooldown(12000)
   async run(i: ChatInputCommandInteraction) {
     const channel = i.channel?.id ?? '';
 
     if (this.games.has(channel)) {
-      await i.reply({
+      await i.followUp({
         content: 'Ya hay una partida activa en este canal.',
         flags: MessageFlags.Ephemeral
       });
       return;
     }
-
-    await i.deferReply();
 
     this.games.add(channel);
 

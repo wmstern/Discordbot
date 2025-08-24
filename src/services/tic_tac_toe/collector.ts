@@ -4,7 +4,7 @@ import {
   type Message,
   type ReadonlyCollection
 } from 'discord.js';
-import type { TTTCommand as Command } from '../../commands/games/ttt.ts';
+import type { TTTCommand as Command } from '../../commands/games/tic_tac_toe.ts';
 import { EndReasons } from '../../types/ttt.types.ts';
 import type GameLogic from './logic.ts';
 

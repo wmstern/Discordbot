@@ -1,5 +1,5 @@
-import { MessageFlags, type ChatInputCommandInteraction } from 'discord.js';
 import { Event, EventBase, type CooldownObject } from '#framework';
+import { MessageFlags, type ChatInputCommandInteraction } from 'discord.js';
 
 @Event('commandBlock')
 export class CommandBlockEvent extends EventBase {

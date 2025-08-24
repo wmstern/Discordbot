@@ -7,8 +7,6 @@ import {
 import 'reflect-metadata';
 
 export abstract class CommandBase {
-  cooldown = 3e3;
-
   cooldowns = new Map<string, CooldownObject>();
 
   abstract run(interaction: ChatInputCommandInteraction): unknown;
@@ -29,36 +27,39 @@ export abstract class CommandBase {
   }
 
   async execute(interaction: ChatInputCommandInteraction) {
+    const userId = interaction.user.id;
+
+    const defer = Reflect.getMetadata('command:defer', this, 'run') as boolean;
+
+    if (defer) await interaction.deferReply();
+
+    const cooldown = Reflect.getMetadata(
+      'command:cooldown',
+      this,
+      'run'
+    ) as number;
+    const hasCooldown = cooldown ? this.cooldowns.has(userId) : false;
+
     try {
-      const cooldown = Reflect.getMetadata(
-        'command:cooldown',
-        this,
-        'run'
-      ) as number;
-      if (cooldown) {
-        if (this.cooldowns.has(interaction.user.id)) {
-          await this.onBlock(
-            interaction,
-            'cooldown',
-            this.cooldowns.get(interaction.user.id)
-          );
-          return;
-        } else {
-          this.cooldowns.set(interaction.user.id, {
-            userId: interaction.user.id,
-            start: Date.now(),
-            time: cooldown,
-            fn: setTimeout(
-              () => this.cooldowns.delete(interaction.user.id),
-              cooldown
-            )
-          });
-        }
+      if (hasCooldown) {
+        await this.onBlock(interaction, 'cooldown', this.cooldowns.get(userId));
+        return;
       }
 
       await this.run(interaction);
     } catch (err) {
       await this.onError(interaction, err as Error);
+    } finally {
+      if (cooldown && !hasCooldown)
+        this.cooldowns.set(interaction.user.id, {
+          userId: interaction.user.id,
+          start: Date.now(),
+          time: cooldown,
+          fn: setTimeout(
+            () => this.cooldowns.delete(interaction.user.id),
+            cooldown
+          )
+        });
     }
   }
 
