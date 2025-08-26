@@ -1,10 +1,12 @@
-import { Event, EventBase } from '#framework';
+import { Event } from '#framework';
 import { type Client } from 'discord.js';
 import { logger } from '../../common/logger.ts';
 
 @Event('ready')
-export class ReadyEvent extends EventBase {
-  run(client: Client) {
-    logger.info(client.user?.tag);
+export class ReadyEvent {
+  async run(client: Client) {
+    const app = await client.application?.fetch();
+    logger.info(app?.name);
+    logger.info(Date.now());
   }
 }

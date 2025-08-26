@@ -1,4 +1,4 @@
-import { Command, CommandBase, Cooldown, DeferReply } from '#framework';
+import { Command, Cooldown, DeferReply } from '#framework';
 import {
   MessageFlags,
   SlashCommandBuilder,
@@ -30,7 +30,7 @@ import { Difficulties } from '../../types/ttt.types.ts';
         .setRequired(false)
     )
 )
-export class TTTCommand extends CommandBase {
+export class TTTCommand {
   games = new Set<string>();
   private collector: TTTCollector = new TTTCollector();
 

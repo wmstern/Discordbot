@@ -1,8 +1,8 @@
-import { Event, EventBase, type CooldownObject } from '#framework';
+import { Event, type CooldownObject } from '#framework';
 import { MessageFlags, type ChatInputCommandInteraction } from 'discord.js';
 
 @Event('commandBlock')
-export class CommandBlockEvent extends EventBase {
+export class CommandBlockEvent {
   async run(i: ChatInputCommandInteraction, reason: string, content: unknown) {
     if (reason === 'cooldown') {
       const cooldown = content as CooldownObject;

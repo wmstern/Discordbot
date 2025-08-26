@@ -1,11 +1,9 @@
-/**
-import { Event, EventBase } from '#framework';
+import { Event } from '#framework';
 import { logger } from '../../common/logger.ts';
 
 @Event('debug')
-export class DebugEvent extends EventBase {
+export class DebugEvent {
   run(msg: string) {
     logger.debug(msg);
   }
 }
-*/

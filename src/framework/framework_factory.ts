@@ -1,80 +1,32 @@
-import {
-  AutocompleteInteraction,
-  ChatInputCommandInteraction,
-  Client,
-  ClientOptions,
-  Collection,
-  REST,
-  Routes,
-  type ClientEvents,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody
-} from 'discord.js';
+import { Client, ClientOptions, REST, Routes } from 'discord.js';
 import { join } from 'node:path';
 import 'reflect-metadata';
-import { CommandBase } from './bases/command.ts';
-import { EventBase } from './bases/event.ts';
+import { CommandHandler } from './handlers/command_handler.ts';
+import { EventHandler } from './handlers/event_handler.ts';
+import type { CommandConstructor } from './types/command.types.ts';
+import type { EventConstructor } from './types/event.types.ts';
 import { getExports } from './utils/files.ts';
 
 export const FrameworkFactory = {
   async create(path: string, options: ClientOptions) {
     const client = createClient(options);
 
-    const acc: {
-      commands: (new () => CommandBase)[];
-      events: (new () => EventBase)[];
-    } = {
-      commands: await getExports<new () => CommandBase>(join(path, 'commands')),
-      events: await getExports<new () => EventBase>(join(path, 'events'))
-    };
+    const commands = await getExports<CommandConstructor>(
+      join(path, 'commands')
+    );
+    const events = await getExports<EventConstructor>(join(path, 'events'));
 
-    const commandMap = new Collection<string, CommandBase>();
-    const commandData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-
-    for (const Cmd of acc.commands) {
-      const instance = new Cmd();
-      const data = Reflect.getMetadata(
-        'command:data',
-        Cmd
-      ) as RESTPostAPIChatInputApplicationCommandsJSONBody;
-      commandMap.set(data.name, instance);
-      commandData.push(data);
-    }
-
-    const handleInteraction = async (interaction: unknown) => {
-      if (interaction instanceof ChatInputCommandInteraction) {
-        const command = commandMap.get(interaction.commandName);
-        if (command) {
-          await command.execute(interaction as ChatInputCommandInteraction);
-        }
-      } else if (interaction instanceof AutocompleteInteraction) {
-        const command = commandMap.get(interaction.commandName);
-        if (command) {
-          await command.executeAutocomplete(
-            interaction as AutocompleteInteraction
-          );
-        }
-      }
-    };
-
-    client.on('interactionCreate', (i) => void handleInteraction(i));
-
-    for (const Ev of acc.events) {
-      const instance = new Ev();
-      const eventName = Reflect.getMetadata(
-        'event:name',
-        Ev
-      ) as keyof ClientEvents;
-      client.on(eventName, (...args) => instance.run(...args));
-    }
+    const commandHandler = new CommandHandler(client, commands);
+    const eventHandler = new EventHandler(client, events);
 
     return {
       client,
-      commandMap,
-      commandData,
+      commandHandler,
+      eventHandler,
       async listen(token: string, id: string) {
         const rest = new REST({ version: '10' }).setToken(token);
         await rest.put(Routes.applicationCommands(id), {
-          body: commandData
+          body: commandHandler.commandData
         });
         await client.login(token);
       }
