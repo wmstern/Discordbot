@@ -1,16 +1,14 @@
 import {
   AutocompleteInteraction,
   CommandInteraction,
-  type ChatInputCommandInteraction,
-  type Client,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody as CommandData,
-  type ContextMenuCommandInteraction
+  type Client
 } from 'discord.js';
 import 'reflect-metadata';
 import type {
   CommandConstructor,
   CooldownObject,
-  SlashCommandConstructor
+  SlashCommandConstructor,
+  CommandMetadata
 } from '../types/command.types.ts';
 
 export class CommandHandler {
@@ -18,7 +16,7 @@ export class CommandHandler {
     string,
     InstanceType<CommandConstructor>
   >();
-  public readonly commandData: CommandData[] = [];
+  public readonly commandData: CommandMetadata['data'][] = [];
 
   public readonly cooldowns = new Map<string, Map<string, CooldownObject>>();
 
@@ -33,7 +31,7 @@ export class CommandHandler {
   #getCommandsStructures() {
     for (const Cmd of this.cmds) {
       const data = Reflect.getMetadata('command:data', Cmd) as
-        | CommandData
+        | CommandMetadata['data']
         | undefined;
       if (!data) continue;
       const instance = new Cmd();
@@ -47,8 +45,10 @@ export class CommandHandler {
       const instance = this.commandMap.get(i.commandName) as
         | InstanceType<SlashCommandConstructor>
         | undefined;
+      if (!instance) return;
+
       try {
-        await instance?.autocomplete?.(i as AutocompleteInteraction);
+        await instance.autocomplete?.(i as AutocompleteInteraction);
       } catch (err) {
         i.client.emit('error', err as Error);
       }
@@ -82,9 +82,7 @@ export class CommandHandler {
       }
 
       try {
-        await instance.run(
-          i as ChatInputCommandInteraction | ContextMenuCommandInteraction
-        );
+        await instance.run(i as never);
       } catch (err) {
         i.client.emit('commandError', i, err as Error);
       } finally {
