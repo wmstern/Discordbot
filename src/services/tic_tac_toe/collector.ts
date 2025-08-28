@@ -4,12 +4,11 @@ import {
   type Message,
   type ReadonlyCollection
 } from 'discord.js';
-import type { TTTCommand as Command } from '../../commands/games/tic_tac_toe.ts';
 import { EndReasons } from '../../types/ttt.types.ts';
 import type GameLogic from './logic.ts';
 
 export class TTTCollector {
-  create(msg: Message, game: GameLogic, command: Command) {
+  create(msg: Message, game: GameLogic, games: Set<string>) {
     const collector = msg.createMessageComponentCollector({
       idle: 180_000,
       componentType: ComponentType.Button
@@ -41,7 +40,7 @@ export class TTTCollector {
       collected: ReadonlyCollection<string, ButtonInteraction>,
       reason: string
     ) => {
-      command.games.delete(msg.channelId);
+      games.delete(msg.channelId);
 
       const i = collected.last();
 

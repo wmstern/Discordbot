@@ -11,7 +11,9 @@ export class CommandBlockEvent {
         1000
       ).toFixed(1);
 
-      await i.reply({
+      const replied = i.replied || i.deferred;
+
+      await i[replied ? 'followUp' : 'reply']({
         content: `You must wait ${remaining} seconds before using this command again.`,
         flags: MessageFlags.Ephemeral
       });

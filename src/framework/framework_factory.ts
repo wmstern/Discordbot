@@ -26,7 +26,7 @@ export const FrameworkFactory = {
       async listen(token: string, id: string) {
         const rest = new REST({ version: '10' }).setToken(token);
         await rest.put(Routes.applicationCommands(id), {
-          body: commandHandler.commandData
+          body: [...commandHandler.commandMetadata.values()].map((m) => m.data)
         });
         await client.login(token);
       }

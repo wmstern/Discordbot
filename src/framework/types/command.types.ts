@@ -1,6 +1,7 @@
 import type {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
+  CommandInteraction,
   ContextMenuCommandInteraction,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   RESTPostAPIContextMenuApplicationCommandsJSONBody
@@ -14,7 +15,7 @@ export type ContextMenuCommandMethod = (
 export type CommandMethod = SlashCommandMethod | ContextMenuCommandMethod;
 
 export interface SlashCommandBase {
-  run: SlashCommandMethod;
+  run?: SlashCommandMethod;
   autocomplete?: SlashCommandAutocomplete;
   [key: string]: SlashCommandMethod | SlashCommandAutocomplete | undefined;
 }
@@ -32,7 +33,10 @@ export type CommandConstructor =
   | ContextMenuCommandConstructor;
 
 export type CommandMethodFilter = (
-  i: ChatInputCommandInteraction | ContextMenuCommandInteraction
+  i:
+    | ChatInputCommandInteraction
+    | ContextMenuCommandInteraction
+    | CommandInteraction
 ) => boolean;
 
 export interface CommandMethodMetadata {
@@ -47,7 +51,7 @@ export interface CommandMetadata {
   data:
     | RESTPostAPIChatInputApplicationCommandsJSONBody
     | RESTPostAPIContextMenuApplicationCommandsJSONBody;
-  methods: Record<string, CommandMethodMetadata>;
+  methods: Record<string, CommandMethodMetadata | undefined>;
 }
 
 export interface CooldownObject {
