@@ -4,12 +4,10 @@ import {
   CommandInteraction,
   type Client
 } from 'discord.js';
-import 'reflect-metadata';
 import type {
   CommandBase,
   CommandConstructor,
   CommandMetadata,
-  CommandMethodMetadata,
   CooldownObject,
   SlashCommandBase
 } from '../types/command.types.ts';
@@ -36,41 +34,38 @@ export class CommandHandler {
 
   #getCommandsStructures() {
     for (const Cmd of this.cmds) {
-      const instance = new Cmd();
-      const metadata = this.#getCommandMetadata(Cmd, instance);
+      const metadata = this.#getCommandMetadata(Cmd);
       if (!metadata) continue;
+      const instance = new Cmd();
       this.commandMap.set(metadata.data.name, instance);
       this.commandMetadata.set(metadata.data.name, metadata);
     }
   }
 
   #getCommandMetadata(
-    Command: CommandConstructor,
-    instance: CommandBase
+    Command: CommandConstructor
   ): CommandMetadata | undefined {
-    const data = Reflect.getMetadata('command:data', Command) as
+    const prototype = Command.prototype as CommandBase;
+
+    const data = Command[Symbol.metadata]?.data as
       | CommandMetadata['data']
       | undefined;
     if (!data) return;
-    const methods: CommandMetadata['methods'] = {};
-    for (const key of Object.getOwnPropertyNames(Command.prototype)) {
-      if (key === 'constructor') continue;
-      const descriptor = Object.getOwnPropertyDescriptor(
-        Command.prototype,
-        key
-      );
-      if (!isCommandMethod(descriptor?.value, instance)) continue;
-      let method = Reflect.getMetadata('command:method', instance, key) as
-        | CommandMethodMetadata
-        | undefined;
-      method ??= { methodName: key, filters: [] };
-      if (method.cooldown)
-        this.cooldowns.set(data.name + method.methodName, new Map());
-      if (key === 'autocomplete') method.isAutocomplete = true;
-      methods[key] = method;
-    }
 
-    if (Object.keys(methods).length === 0) return;
+    const methods = (Command[Symbol.metadata]?.methods ??
+      {}) as CommandMetadata['methods'];
+
+    for (const key of Object.getOwnPropertyNames(prototype)) {
+      if (key === 'constructor') continue;
+      const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
+      if (!isCommandMethod(descriptor?.value, prototype)) continue;
+
+      methods[key] ??= { methodName: key, filters: [] };
+
+      if (methods[key].cooldown)
+        this.cooldowns.set(data.name + methods[key].methodName, new Map());
+      if (key === 'autocomplete') methods[key].isAutocomplete = true;
+    }
 
     return { data, methods };
   }

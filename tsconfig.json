@@ -18,12 +18,12 @@
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "ESNext.Decorators"],
     "target": "esnext",
     "useDefineForClassFields": true,
     "pretty": true,
     "noEmit": true
   },
-  "include": ["src/**/*", "src/modules/events/commands/block.ts"],
+  "include": ["src/**/*", "src/commands/utils/ping.ts"],
   "exclude": ["node_modules", "dist", "__tests__"]
 }

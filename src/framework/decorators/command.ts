@@ -1,78 +1,60 @@
 import type {
   SlashCommandBuilder,
-  SlashCommandOptionsOnlyBuilder
+  SlashCommandOptionsOnlyBuilder,
+  SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
-import 'reflect-metadata';
 import type {
+  CommandMetadata,
   CommandMethod,
-  CommandMethodFilter,
-  CommandMethodMetadata
+  CommandMethodFilter
 } from '../types/command.types.ts';
 
 export type CommandOptions =
   | SlashCommandBuilder
-  | SlashCommandOptionsOnlyBuilder;
+  | SlashCommandOptionsOnlyBuilder
+  | SlashCommandSubcommandsOnlyBuilder;
 
-type CommandBase = object;
 type CommandConstructor = new () => object;
 
 export function Command(command: CommandOptions) {
-  const data = command.toJSON();
-  return (target: CommandConstructor) => {
-    Reflect.defineMetadata('command:data', data, target);
+  return (_target: CommandConstructor, context: ClassDecoratorContext) => {
+    context.metadata.data = command.toJSON();
+    context.metadata.methods ??= {};
   };
 }
 
 export function Cooldown(time: number) {
-  return (
-    _target: CommandMethod,
-    context: ClassMethodDecoratorContext<CommandBase>
-  ) => {
-    context.addInitializer(function () {
-      const original = (Reflect.getMetadata(
-        'command:method',
-        this,
-        context.name
-      ) ?? { methodName: context.name, filters: [] }) as CommandMethodMetadata;
-      const method: CommandMethodMetadata = { ...original, cooldown: time };
-      Reflect.defineMetadata('command:method', method, this, context.name);
+  return (_target: CommandMethod, context: ClassMethodDecoratorContext) => {
+    context.metadata.methods ??= {};
+    const methods = context.metadata.methods as CommandMetadata['methods'];
+    const method = (methods[String(context.name)] ??= {
+      methodName: String(context.name),
+      filters: []
     });
+    method.cooldown = time;
   };
 }
 
 export function DeferReply(defer = true) {
-  return (
-    _target: CommandMethod,
-    context: ClassMethodDecoratorContext<CommandBase>
-  ) => {
-    context.addInitializer(function () {
-      const original = (Reflect.getMetadata(
-        'command:method',
-        this,
-        context.name
-      ) ?? { methodName: context.name, filters: [] }) as CommandMethodMetadata;
-      const method: CommandMethodMetadata = { ...original, defer };
-      Reflect.defineMetadata('command:method', method, this, context.name);
+  return (_target: CommandMethod, context: ClassMethodDecoratorContext) => {
+    context.metadata.methods ??= {};
+    const methods = context.metadata.methods as CommandMetadata['methods'];
+    const method = (methods[String(context.name)] ??= {
+      methodName: String(context.name),
+      filters: []
     });
+    method.defer = defer;
   };
 }
 
 export function Filters(...filters: CommandMethodFilter[]) {
-  return (
-    _target: CommandMethod,
-    context: ClassMethodDecoratorContext<CommandBase>
-  ) => {
-    context.addInitializer(function () {
-      const original = (Reflect.getMetadata(
-        'command:method',
-        this,
-        context.name
-      ) ?? { methodName: context.name, filters: [] }) as CommandMethodMetadata;
-      const method: CommandMethodMetadata = {
-        ...original,
-        filters: [...original.filters, ...filters]
-      };
-      Reflect.defineMetadata('command:method', method, this, context.name);
+  return (_target: CommandMethod, context: ClassMethodDecoratorContext) => {
+    context.metadata.methods ??= {};
+    const methods = context.metadata.methods as CommandMetadata['methods'];
+    const method = (methods[String(context.name)] ??= {
+      methodName: String(context.name),
+      filters: []
     });
+    method.filters.push(...filters);
   };
 }

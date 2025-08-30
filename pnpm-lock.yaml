@@ -7,17 +7,20 @@ settings:
 importers:
   .:
     dependencies:
+      core-js:
+        specifier: ^3.45.1
+        version: 3.45.1
       discord.js:
         specifier: 14.21.0
         version: 14.21.0
       pino:
-        specifier: ^9.9.0
+        specifier: 9.9.0
         version: 9.9.0
       pino-pretty:
-        specifier: ^13.1.1
+        specifier: 13.1.1
         version: 13.1.1
       reflect-metadata:
-        specifier: ^0.2.2
+        specifier: 0.2.2
         version: 0.2.2
     devDependencies:
       '@commitlint/cli':
@@ -1220,6 +1223,12 @@ packages:
       }
     engines: { node: '>=16' }
     hasBin: true
+
+  core-js@3.45.1:
+    resolution:
+      {
+        integrity: sha512-L4NPsJlCfZsPeXukyzHFlg/i7IIVwHSItR0wg0FLNqYClJ4MQYTYLbC7EkjKYRLZF2iof2MUgN0EGy7MdQFChg==
+      }
 
   cosmiconfig-typescript-loader@6.1.0:
     resolution:
@@ -3523,6 +3532,8 @@ snapshots:
       is-text-path: 2.0.0
       meow: 12.1.1
       split2: 4.2.0
+
+  core-js@3.45.1: {}
 
   cosmiconfig-typescript-loader@6.1.0(@types/node@24.2.1)(cosmiconfig@9.0.0(typescript@5.9.2))(typescript@5.9.2):
     dependencies:

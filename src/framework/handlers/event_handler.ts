@@ -1,5 +1,4 @@
 import type { Client } from 'discord.js';
-import 'reflect-metadata';
 import type { EventConstructor } from '../types/event.types.ts';
 
 export class EventHandler {
@@ -15,7 +14,7 @@ export class EventHandler {
 
   #getEventsStructures() {
     for (const Ev of this.evs) {
-      const name = Reflect.getMetadata('event:name', Ev) as string | undefined;
+      const name = Ev[Symbol.metadata]?.name as string | undefined;
       if (!name) continue;
       const instance = new Ev();
       this.eventInstances.push(instance);

@@ -6,7 +6,7 @@ import { logger } from '../../common/logger.ts';
 export class ReadyEvent {
   async run(client: Client) {
     const app = await client.application?.fetch();
-    logger.info(app?.name);
-    logger.info(Date.now());
+    const commands = await app?.commands.fetch();
+    logger.info(app?.name, commands?.map((c) => c.name).join('\n'));
   }
 }
