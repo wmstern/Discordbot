@@ -5,11 +5,14 @@ import type {
   SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
 
-export type CommandOptions =
+export type SlashCommand =
   | SlashCommandBuilder
   | SlashCommandOptionsOnlyBuilder
-  | SlashCommandSubcommandsOnlyBuilder
-  | ContextMenuCommandBuilder;
+  | SlashCommandSubcommandsOnlyBuilder;
+
+export type ContextMenuCommand = ContextMenuCommandBuilder;
+
+export type CommandOptions = SlashCommand | ContextMenuCommandBuilder;
 
 type CommandConstructor = new () => object;
 
@@ -21,4 +24,12 @@ export function Command(command: CommandOptions) {
     context.metadata.type = data.type;
     context.metadata.methods ??= [];
   };
+}
+
+export function SlashCommand(command: SlashCommand) {
+  return Command(command);
+}
+
+export function ContextMenuCommand(command: ContextMenuCommand) {
+  return Command(command);
 }
