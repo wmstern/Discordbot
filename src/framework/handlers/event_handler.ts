@@ -25,7 +25,7 @@ export class EventHandler {
         if (!name) continue;
         this.events.add(name);
 
-        const instance = new Ev();
+        const instance = new Ev(Ev.length === 1 ? this.client : undefined);
         const fn = instance[key];
         this.client.on(name, (...args) => void fn(...args));
       }

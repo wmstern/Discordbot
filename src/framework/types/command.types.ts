@@ -2,6 +2,7 @@ import type {
   ApplicationCommandType,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
+  Client,
   CommandInteraction,
   ContextMenuCommandInteraction,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -22,7 +23,7 @@ export type CommandBase = Record<
   PropertyKey,
   CommandMethod<CommandContext> | AutocompleteMethod
 >;
-export type CommandConstructor = new (...args: any) => CommandBase;
+export type CommandConstructor = new (client?: Client) => CommandBase;
 
 export interface FilterResponse {
   block: boolean;
@@ -30,8 +31,7 @@ export interface FilterResponse {
   context?: unknown;
 }
 export type CommandMethodFilterResponse =
-  | FilterResponse
-  | boolean
+  | (FilterResponse | boolean)
   | Promise<FilterResponse | boolean>;
 
 export type CommandMethodFilter<T extends CommandContext> = (

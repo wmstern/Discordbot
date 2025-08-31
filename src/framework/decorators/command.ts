@@ -1,4 +1,5 @@
 import type {
+  Client,
   ContextMenuCommandBuilder,
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
@@ -14,7 +15,7 @@ export type ContextMenuCommand = ContextMenuCommandBuilder;
 
 export type CommandOptions = SlashCommand | ContextMenuCommandBuilder;
 
-type CommandConstructor = new () => object;
+type CommandConstructor = (new () => object) | (new (client: Client) => object);
 
 export function Command(command: CommandOptions) {
   const data = command.toJSON();

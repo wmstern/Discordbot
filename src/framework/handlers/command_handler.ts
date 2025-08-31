@@ -33,7 +33,7 @@ export class CommandHandler {
       const metadata = this.#getCommandMetadata(Cmd);
       if (!metadata) continue;
 
-      const instance = new Cmd();
+      const instance = new Cmd(Cmd.length === 1 ? this.client : undefined);
       this.commandMap.set(metadata.data.name, instance);
       this.commandMetadata.set(metadata.data.name, metadata);
     }

@@ -1,4 +1,4 @@
-import type { ClientEvents } from 'discord.js';
+import type { Client, ClientEvents } from 'discord.js';
 
 export type EventMethod<key extends keyof ClientEvents> = (
   ...args: ClientEvents[key]
@@ -6,4 +6,4 @@ export type EventMethod<key extends keyof ClientEvents> = (
 
 export type EventBase = Record<PropertyKey, EventMethod<keyof ClientEvents>>;
 
-export type EventConstructor = new () => EventBase;
+export type EventConstructor = new (client?: Client) => EventBase;
