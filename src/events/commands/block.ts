@@ -1,11 +1,16 @@
-import { Event, type CooldownObject } from '#framework';
-import { MessageFlags, type ChatInputCommandInteraction } from 'discord.js';
+import {
+  Event,
+  type CommandContext,
+  type CooldownObject,
+  type FilterResponse
+} from '#framework';
+import { MessageFlags } from 'discord.js';
 
-@Event('commandBlock')
 export class CommandBlockEvent {
-  async run(i: ChatInputCommandInteraction, reason: string, content: unknown) {
+  @Event('commandBlock')
+  async run(i: CommandContext, { reason, context }: FilterResponse) {
     if (reason === 'cooldown') {
-      const cooldown = content as CooldownObject;
+      const cooldown = context as CooldownObject;
       const remaining = (
         (cooldown.start + cooldown.time - Date.now()) /
         1000

@@ -1,9 +1,8 @@
-import type { Client } from 'discord.js';
-import type { EventConstructor } from '../types/event.types.ts';
+import type { Client, ClientEvents } from 'discord.js';
+import type { EventMethod, EventConstructor } from '../types/event.types.ts';
 
 export class EventHandler {
-  public readonly events = new Set<string>();
-  public readonly eventInstances: InstanceType<EventConstructor>[] = [];
+  public readonly events = new Set<keyof ClientEvents>();
 
   constructor(
     protected readonly client: Client,
@@ -14,15 +13,19 @@ export class EventHandler {
 
   #getEventsStructures() {
     for (const Ev of this.evs) {
-      const name = Ev[Symbol.metadata]?.name as string | undefined;
-      if (!name) continue;
-      const instance = new Ev();
-      this.eventInstances.push(instance);
-      this.#RegisterEvent(name, instance);
-    }
-  }
+      for (const key of Object.getOwnPropertyNames(Ev.prototype)) {
+        if (key === 'constructor') continue;
+        const descriptor = Object.getOwnPropertyDescriptor(Ev.prototype, key);
+        if (typeof descriptor?.value !== 'function') continue;
+        const name = Ev[Symbol.metadata]?.[key] as
+          | keyof ClientEvents
+          | undefined;
+        if (!name) continue;
+        this.events.add(name);
 
-  #RegisterEvent(name: string, ev: InstanceType<EventConstructor>) {
-    this.client.on(name, (...args: unknown[]) => void ev.run(...args));
+        const fn = descriptor.value as EventMethod<keyof ClientEvents>;
+        this.client.on(name, (...args) => void fn(...args));
+      }
+    }
   }
 }

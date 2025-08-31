@@ -1,5 +1,9 @@
-export interface EventBase {
-  run(...args: unknown[]): unknown;
-}
+import type { ClientEvents } from 'discord.js';
+
+export type EventMethod<key extends keyof ClientEvents> = (
+  ...args: ClientEvents[key]
+) => unknown;
+
+export type EventBase = Record<PropertyKey, EventMethod<keyof ClientEvents>>;
 
 export type EventConstructor = new () => EventBase;

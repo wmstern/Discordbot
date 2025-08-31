@@ -24,12 +24,15 @@ export type CommandBase = Record<
 >;
 export type CommandConstructor = new (...args: any) => CommandBase;
 
-export type FilterResponse =
-  | boolean
-  | { block: boolean; reason?: string; context?: unknown };
+export interface FilterResponse {
+  block: boolean;
+  reason?: string;
+  context?: unknown;
+}
 export type CommandMethodFilterResponse =
   | FilterResponse
-  | Promise<FilterResponse>;
+  | boolean
+  | Promise<FilterResponse | boolean>;
 
 export type CommandMethodFilter<T extends CommandContext> = (
   interaction: T
