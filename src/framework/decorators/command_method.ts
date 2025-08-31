@@ -19,7 +19,8 @@ export function Execute(name?: string) {
     const methods = getMethods(context);
     if (!methods) return;
 
-    if (methods.some((m) => m.name === name)) throw new Error();
+    if (methods.some((m) => m.name === (name ?? DEFAULT_METHOD)))
+      throw new Error();
 
     const method = ensureMethod(methods, context.name);
     if (method) {
