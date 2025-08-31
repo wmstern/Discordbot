@@ -1,13 +1,17 @@
 import { ApplicationCommandType } from 'discord.js';
 import type {
   AutocompleteMethod,
+  CommandContext,
   CommandMethod,
   CommandMethodFilter,
   CommandMethodMetadata
 } from '../types/command.types.ts';
 
 export function Execute(name = 'run') {
-  return (_target: CommandMethod, context: DecoratorContext) => {
+  return <T extends CommandContext>(
+    _target: CommandMethod<T>,
+    context: DecoratorContext
+  ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
     context.metadata.methods ??= [];
@@ -24,7 +28,10 @@ export function Execute(name = 'run') {
 }
 
 export function Cooldown(time: number) {
-  return (_target: CommandMethod, context: DecoratorContext) => {
+  return <T extends CommandContext>(
+    _target: CommandMethod<T>,
+    context: DecoratorContext
+  ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
     const methods = getMethods(context);
@@ -37,7 +44,10 @@ export function Cooldown(time: number) {
 }
 
 export function DeferReply(defer = true) {
-  return (_target: CommandMethod, context: DecoratorContext) => {
+  return <T extends CommandContext>(
+    _target: CommandMethod<T>,
+    context: DecoratorContext
+  ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
     const methods = getMethods(context);
@@ -49,8 +59,11 @@ export function DeferReply(defer = true) {
   };
 }
 
-export function Filters(...filters: CommandMethodFilter[]) {
-  return (_target: CommandMethod, context: DecoratorContext) => {
+export function Filters(...filters: CommandMethodFilter<CommandContext>[]) {
+  return <T extends CommandContext>(
+    _target: CommandMethod<T>,
+    context: DecoratorContext
+  ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
     const methods = getMethods(context);

@@ -1,14 +1,16 @@
-import { ApplicationCommandType, type CommandInteraction } from 'discord.js';
-import {
+import { ApplicationCommandType } from 'discord.js';
+import type {
   AutocompleteMethod,
+  CommandContext,
   CommandMetadata,
+  CommandMethod,
   CommandMethodMetadata
 } from '../types/command.types.ts';
 
 export function isCommandMethod(
   metadata: CommandMethodMetadata,
   method: unknown
-): method is (i: CommandInteraction) => unknown {
+): method is CommandMethod<CommandContext> {
   return (
     typeof method === 'function' &&
     method.length === 1 &&

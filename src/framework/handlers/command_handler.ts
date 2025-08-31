@@ -58,7 +58,7 @@ export class CommandHandler {
       try {
         await this.#commandExecute(i, instance, metadata);
       } catch (err) {
-        i.client.emit('commandError', i, err as Error);
+        i.client.emit('commandError', i, err as Error, metadata);
       }
     } else if (i.isAutocomplete()) {
       const instance = this.commandMap.get(i.commandName);
@@ -68,7 +68,7 @@ export class CommandHandler {
       try {
         await this.#autocompleteExecute(i, instance, metadata);
       } catch (err) {
-        i.client.emit('error', err as Error);
+        i.client.emit('autocompleteError', i, err as Error, metadata);
       }
     }
   }
@@ -95,7 +95,12 @@ export class CommandHandler {
     const hasCooldown = cooldown ? cooldowns?.has(i.user.id) : false;
 
     if (cooldowns && hasCooldown) {
-      i.client.emit('commandBlock', i, 'cooldown', cooldowns.get(i.user.id));
+      const response = {
+        block: true,
+        reason: 'cooldown',
+        context: cooldowns.get(i.user.id)
+      };
+      i.client.emit('commandBlock', i, response, metadata);
       return;
     }
 
@@ -105,11 +110,11 @@ export class CommandHandler {
       let response = await filter(i);
 
       if (typeof response === 'boolean') {
-        response = { block: response, reason: '', context: null };
+        response = { block: response, reason: undefined, context: null };
       }
 
       if (response.block) {
-        i.client.emit('commandBlock', i, response.reason, response.context);
+        i.client.emit('commandBlock', i, response, metadata);
         return;
       }
     }

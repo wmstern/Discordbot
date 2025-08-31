@@ -8,34 +8,39 @@ import type {
   RESTPostAPIContextMenuApplicationCommandsJSONBody
 } from 'discord.js';
 
+export type CommandContext =
+  | CommandInteraction
+  | ChatInputCommandInteraction
+  | ContextMenuCommandInteraction;
+
 export type AutocompleteMethod = (i: AutocompleteInteraction) => unknown;
-export type CommandMethod =
-  | ((i: ChatInputCommandInteraction) => unknown)
-  | ((i: ContextMenuCommandInteraction) => unknown)
-  | ((i: CommandInteraction) => unknown);
+export type CommandMethod<T extends CommandContext> = (
+  interaction: T
+) => unknown;
 
 export type CommandBase = Record<
   PropertyKey,
-  CommandMethod | AutocompleteMethod
+  CommandMethod<CommandContext> | AutocompleteMethod
 >;
 export type CommandConstructor = new (...args: any) => CommandBase;
 
-export type CommandMethodFilterResponse =
+export type FilterResponse =
   | boolean
-  | { block: boolean; reason: string; context?: unknown };
-export type CommandMethodFilter = (
-  i:
-    | ChatInputCommandInteraction
-    | ContextMenuCommandInteraction
-    | CommandInteraction
-) => CommandMethodFilterResponse | Promise<CommandMethodFilterResponse>;
+  | { block: boolean; reason?: string; context?: unknown };
+export type CommandMethodFilterResponse =
+  | FilterResponse
+  | Promise<FilterResponse>;
+
+export type CommandMethodFilter<T extends CommandContext> = (
+  interaction: T
+) => CommandMethodFilterResponse;
 
 export interface CommandMethodMetadata {
   methodName: string;
   name: string;
   cooldown?: number;
   defer?: boolean;
-  filters: CommandMethodFilter[];
+  filters: CommandMethodFilter<CommandContext>[];
 }
 
 export interface SlashCommandAutocompleteMetadata {
