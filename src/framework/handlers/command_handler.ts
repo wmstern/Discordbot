@@ -4,6 +4,7 @@ import {
   CommandInteraction,
   type Client
 } from 'discord.js';
+import { DEFAULT_METHOD } from '../decorators/command_method.ts';
 import type {
   CommandBase,
   CommandConstructor,
@@ -81,7 +82,7 @@ export class CommandHandler {
     instance: CommandBase,
     metadata: CommandMetadata
   ) {
-    let method = metadata.methods.find((m) => m.name === 'run');
+    let method = metadata.methods.find((m) => m.name === DEFAULT_METHOD);
 
     if (i.isChatInputCommand()) {
       const sub = i.options.getSubcommand(false);

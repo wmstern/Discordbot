@@ -7,7 +7,9 @@ import type {
   CommandMethodMetadata
 } from '../types/command.types.ts';
 
-export function Execute(name = 'run') {
+export const DEFAULT_METHOD = '/';
+
+export function Execute(name?: string) {
   return <T extends CommandContext>(
     _target: CommandMethod<T>,
     context: DecoratorContext
@@ -21,7 +23,7 @@ export function Execute(name = 'run') {
 
     const method = ensureMethod(methods, context.name);
     if (method) {
-      method.name = name;
+      method.name = name ?? DEFAULT_METHOD;
       method.filters = [];
     }
   };

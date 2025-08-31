@@ -12,11 +12,6 @@ const embeds: Record<PropertyKey, EmbedBuilder> = {};
   new SlashCommandBuilder()
     .setName('help')
     .setDescription('Muestra la lista de comandos.')
-    .addBooleanOption((opt) =>
-      opt
-        .setName('server')
-        .setDescription('Muestra la lista de comandos del server.')
-    )
 )
 export class HelpCommand {
   @Execute()
