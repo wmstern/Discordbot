@@ -14,12 +14,12 @@ export function Execute(name = 'run') {
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
-    context.metadata.methods ??= [];
     const methods = getMethods(context);
     if (!methods) return;
-    let method = methods.find((m) => m.methodName === context.name);
-    if (!method) methods.push({ methodName: context.name });
-    method = methods.find((m) => m.methodName === context.name);
+
+    if (methods.some((m) => m.name === name)) throw new Error();
+
+    const method = ensureMethod(methods, context.name);
     if (method) {
       method.name = name;
       method.filters = [];
@@ -34,11 +34,11 @@ export function Cooldown(time: number) {
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
+
     const methods = getMethods(context);
     if (!methods) return;
-    let method = methods.find((m) => m.methodName === context.name);
-    if (!method) methods.push({ methodName: context.name });
-    method = methods.find((m) => m.methodName === context.name);
+
+    const method = ensureMethod(methods, context.name);
     if (method) method.cooldown = time;
   };
 }
@@ -50,11 +50,11 @@ export function DeferReply(defer = true) {
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
+
     const methods = getMethods(context);
     if (!methods) return;
-    let method = methods.find((m) => m.methodName === context.name);
-    if (!method) methods.push({ methodName: context.name });
-    method = methods.find((m) => m.methodName === context.name);
+
+    const method = ensureMethod(methods, context.name);
     if (method) method.defer = defer;
   };
 }
@@ -66,11 +66,11 @@ export function Filters(...filters: CommandMethodFilter<CommandContext>[]) {
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
+
     const methods = getMethods(context);
     if (!methods) return;
-    let method = methods.find((m) => m.methodName === context.name);
-    if (!method) methods.push({ methodName: context.name });
-    method = methods.find((m) => m.methodName === context.name);
+
+    const method = ensureMethod(methods, context.name);
     if (method) {
       method.filters = [...(method.filters ?? []), ...filters];
     }
@@ -83,6 +83,8 @@ export function Autocomplete() {
       throw new Error();
     if (context.metadata.type !== ApplicationCommandType.ChatInput)
       throw new Error();
+    if (context.metadata.autocomplete) throw new Error();
+
     context.metadata.autocomplete = {
       methodName: context.name
     };
@@ -95,4 +97,14 @@ function getMethods(
   context.metadata.methods ??= [];
   const methods = context.metadata.methods as Partial<CommandMethodMetadata>[];
   return methods;
+}
+
+function ensureMethod(
+  methods: Partial<CommandMethodMetadata>[],
+  methodName: string
+): Partial<CommandMethodMetadata> | undefined {
+  let method = methods.find((m) => m.methodName === methodName);
+  if (!method) methods.push({ methodName });
+  method = methods.find((m) => m.methodName === methodName);
+  return method;
 }
