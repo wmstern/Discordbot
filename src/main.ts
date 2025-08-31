@@ -11,7 +11,7 @@ try {
       repliedUser: false
     }
   });
-  await app.listen(config.env.discordBotToken, config.env.discordClientId);
+  app.listen(config.env.discordBotToken, config.env.discordClientId);
 } catch (err) {
   logger.error(err);
   process.exit(1);

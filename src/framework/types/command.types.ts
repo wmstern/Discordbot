@@ -1,4 +1,5 @@
 import type {
+  ApplicationCommandType,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
   CommandInteraction,
@@ -7,51 +8,47 @@ import type {
   RESTPostAPIContextMenuApplicationCommandsJSONBody
 } from 'discord.js';
 
-export type SlashCommandMethod = (i: ChatInputCommandInteraction) => unknown;
-export type SlashCommandAutocomplete = (i: AutocompleteInteraction) => unknown;
-export type ContextMenuCommandMethod = (
-  i: ContextMenuCommandInteraction
-) => unknown;
-export type CommandMethod = SlashCommandMethod | ContextMenuCommandMethod;
+export type AutocompleteMethod = (i: AutocompleteInteraction) => unknown;
+export type CommandMethod =
+  | ((i: ChatInputCommandInteraction) => unknown)
+  | ((i: ContextMenuCommandInteraction) => unknown)
+  | ((i: CommandInteraction) => unknown);
 
-export interface SlashCommandBase {
-  run?: SlashCommandMethod;
-  autocomplete?: SlashCommandAutocomplete;
-  [key: string]: SlashCommandMethod | SlashCommandAutocomplete | undefined;
-}
+export type CommandBase = Record<
+  PropertyKey,
+  CommandMethod | AutocompleteMethod
+>;
+export type CommandConstructor = new (...args: any) => CommandBase;
 
-export interface ContextMenuCommandBase {
-  run: ContextMenuCommandMethod;
-}
-
-export type CommandBase = SlashCommandBase | ContextMenuCommandBase;
-
-export type SlashCommandConstructor = new () => SlashCommandBase;
-export type ContextMenuCommandConstructor = new () => ContextMenuCommandBase;
-export type CommandConstructor =
-  | SlashCommandConstructor
-  | ContextMenuCommandConstructor;
-
+export type CommandMethodFilterResponse =
+  | boolean
+  | { block: boolean; reason: string; context?: unknown };
 export type CommandMethodFilter = (
   i:
     | ChatInputCommandInteraction
     | ContextMenuCommandInteraction
     | CommandInteraction
-) => boolean;
+) => CommandMethodFilterResponse | Promise<CommandMethodFilterResponse>;
 
 export interface CommandMethodMetadata {
   methodName: string;
-  isAutocomplete?: boolean;
+  name: string;
   cooldown?: number;
   defer?: boolean;
   filters: CommandMethodFilter[];
+}
+
+export interface SlashCommandAutocompleteMetadata {
+  methodName: string;
 }
 
 export interface CommandMetadata {
   data:
     | RESTPostAPIChatInputApplicationCommandsJSONBody
     | RESTPostAPIContextMenuApplicationCommandsJSONBody;
-  methods: Record<string, CommandMethodMetadata | undefined>;
+  type: ApplicationCommandType;
+  methods: CommandMethodMetadata[];
+  autocomplete?: SlashCommandAutocompleteMetadata;
 }
 
 export interface CooldownObject {

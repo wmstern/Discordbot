@@ -8,15 +8,9 @@ import type {
   CommandBase,
   CommandConstructor,
   CommandMetadata,
-  CooldownObject,
-  SlashCommandBase
+  CooldownObject
 } from '../types/command.types.ts';
-import {
-  isCommandMethod,
-  isContextMenuCommand,
-  isSlashCommand,
-  isSlashCommandMethod
-} from '../utils/command_helpers.ts';
+import { isAutocomplete, isCommandMethod } from '../utils/command_helpers.ts';
 
 export class CommandHandler {
   public readonly commandMap = new Map<string, CommandBase>();
@@ -45,29 +39,14 @@ export class CommandHandler {
   #getCommandMetadata(
     Command: CommandConstructor
   ): CommandMetadata | undefined {
-    const prototype = Command.prototype as CommandBase;
+    const metadata = Command[Symbol.metadata] as CommandMetadata | null;
+    if (!metadata?.data) return;
 
-    const data = Command[Symbol.metadata]?.data as
-      | CommandMetadata['data']
-      | undefined;
-    if (!data) return;
+    for (const method of metadata.methods)
+      if (method.cooldown)
+        this.cooldowns.set(metadata.data.name + method.name, new Map());
 
-    const methods = (Command[Symbol.metadata]?.methods ??
-      {}) as CommandMetadata['methods'];
-
-    for (const key of Object.getOwnPropertyNames(prototype)) {
-      if (key === 'constructor') continue;
-      const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
-      if (!isCommandMethod(descriptor?.value, prototype)) continue;
-
-      methods[key] ??= { methodName: key, filters: [] };
-
-      if (methods[key].cooldown)
-        this.cooldowns.set(data.name + methods[key].methodName, new Map());
-      if (key === 'autocomplete') methods[key].isAutocomplete = true;
-    }
-
-    return { data, methods };
+    return metadata;
   }
 
   async #interactionCreate(i: BaseInteraction) {
@@ -75,6 +54,7 @@ export class CommandHandler {
       const instance = this.commandMap.get(i.commandName);
       const metadata = this.commandMetadata.get(i.commandName);
       if (!instance || !metadata) return;
+
       try {
         await this.#commandExecute(i, instance, metadata);
       } catch (err) {
@@ -84,12 +64,9 @@ export class CommandHandler {
       const instance = this.commandMap.get(i.commandName);
       const metadata = this.commandMetadata.get(i.commandName);
       if (!instance || !metadata) return;
+
       try {
-        await this.#autocompleteExecute(
-          i,
-          instance as SlashCommandBase,
-          metadata
-        );
+        await this.#autocompleteExecute(i, instance, metadata);
       } catch (err) {
         i.client.emit('error', err as Error);
       }
@@ -101,17 +78,20 @@ export class CommandHandler {
     instance: CommandBase,
     metadata: CommandMetadata
   ) {
-    let method = metadata.methods.run;
+    let method = metadata.methods.find((m) => m.name === 'run');
 
     if (i.isChatInputCommand()) {
       const sub = i.options.getSubcommand(false);
-      if (sub) method = metadata.methods[sub];
+      if (sub) method = metadata.methods.find((m) => m.name === sub);
     }
 
     if (!method) return;
 
+    const execute = instance[method.methodName];
+    if (!isCommandMethod(method, execute)) return;
+
     const cooldown = method.cooldown;
-    const cooldowns = this.cooldowns.get(i.commandName + method.methodName);
+    const cooldowns = this.cooldowns.get(i.commandName + method.name);
     const hasCooldown = cooldown ? cooldowns?.has(i.user.id) : false;
 
     if (cooldowns && hasCooldown) {
@@ -122,22 +102,19 @@ export class CommandHandler {
     if (method.defer) await i.deferReply();
 
     for (const filter of method.filters) {
-      if (filter(i)) {
-        i.client.emit('commandBlock', i, 'filter', filter);
+      let response = await filter(i);
+
+      if (typeof response === 'boolean') {
+        response = { block: response, reason: '', context: null };
+      }
+
+      if (response.block) {
+        i.client.emit('commandBlock', i, response.reason, response.context);
         return;
       }
     }
 
-    if (i.isChatInputCommand() && isSlashCommand(instance, i.commandType)) {
-      const run = instance[method.methodName];
-      if (!isSlashCommandMethod(run, instance)) return;
-      await run(i);
-    } else if (
-      i.isContextMenuCommand() &&
-      isContextMenuCommand(instance, i.commandType)
-    ) {
-      await instance.run(i);
-    }
+    await execute(i);
 
     if (cooldown && cooldowns && !hasCooldown) {
       cooldowns.set(i.user.id, {
@@ -151,11 +128,15 @@ export class CommandHandler {
 
   async #autocompleteExecute(
     i: AutocompleteInteraction,
-    instance: SlashCommandBase,
+    instance: CommandBase,
     metadata: CommandMetadata
   ) {
-    const method = metadata.methods.autocomplete;
-    if (!method?.isAutocomplete) return;
-    await instance.autocomplete?.(i);
+    const autocomplete = metadata.autocomplete;
+    if (!autocomplete) return;
+
+    const execute = instance[autocomplete.methodName];
+    if (!isAutocomplete(metadata, execute)) return;
+
+    await execute(i);
   }
 }

@@ -1,4 +1,4 @@
-import { Command, Cooldown, DeferReply } from '#framework';
+import { Command, Cooldown, DeferReply, Execute } from '#framework';
 import {
   MessageFlags,
   SlashCommandBuilder,
@@ -34,10 +34,11 @@ const collector = new TTTCollector();
     )
 )
 export class TTTCommand {
+  @Execute()
   @DeferReply(true)
   @Cooldown(12000)
   async run(i: ChatInputCommandInteraction) {
-    const channel = i.channel?.id ?? '';
+    const channel = i.channelId;
 
     if (games.has(channel)) {
       await i.followUp({
@@ -52,7 +53,7 @@ export class TTTCommand {
     const player1 = i.user;
     const player2 = i.options.getUser('adversario', false) ?? i.client.user;
     const difficulty =
-      (i.options.getString('dificultad', false) as Difficulties | undefined) ??
+      (i.options.getString('dificultad', false) as Difficulties | null) ??
       Difficulties.MEDIUM;
 
     const game = new GameLogic(player1, player2, difficulty);

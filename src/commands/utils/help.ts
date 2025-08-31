@@ -1,31 +1,28 @@
-import { Command, Cooldown, Filters } from '#framework';
+import { Command, Cooldown, Execute } from '#framework';
 import {
   EmbedBuilder,
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from 'discord.js';
 
+const KEY = 'GLOBAL';
 const embeds: Record<PropertyKey, EmbedBuilder> = {};
 
 @Command(
   new SlashCommandBuilder()
     .setName('help')
     .setDescription('Muestra la lista de comandos.')
-    .addSubcommand((sub) =>
-      sub
-        .setName('global')
-        .setDescription('Muestra la lista de comandos del bot.')
-    )
-    .addSubcommand((sub) =>
-      sub
+    .addBooleanOption((opt) =>
+      opt
         .setName('server')
-        .setDescription('Muestra la lista de comandos del servidor.')
+        .setDescription('Muestra la lista de comandos del server.')
     )
 )
 export class HelpCommand {
+  @Execute()
   @Cooldown(6000)
-  async global(i: ChatInputCommandInteraction) {
-    if (!('global' in embeds)) {
+  async run(i: ChatInputCommandInteraction) {
+    if (!(KEY in embeds)) {
       embeds.global = new EmbedBuilder();
       const commands = await (
         await i.client.application.fetch()
@@ -37,24 +34,6 @@ export class HelpCommand {
 
     await i.reply({
       embeds: [embeds.global]
-    });
-  }
-
-  @Cooldown(6000)
-  @Filters((i) => !i.guild)
-  async server(i: ChatInputCommandInteraction) {
-    if (!i.guild) return;
-
-    if (!(i.guild.id in embeds)) {
-      embeds[i.guild.id] = new EmbedBuilder();
-      const commands = await (await i.guild.fetch()).commands.fetch();
-      embeds[i.guild.id].setDescription(
-        '```\n' + commands.map((cmd) => `/${cmd.name}`).join('\n') + '\n```'
-      );
-    }
-
-    await i.reply({
-      embeds: [embeds[i.guild.id]]
     });
   }
 }
