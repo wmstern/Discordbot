@@ -28,8 +28,11 @@ export class CommandHandler {
 
   #getCommandsStructures() {
     for (const Cmd of this.cmds) {
+      if (typeof Cmd !== 'function' || !('prototype' in Cmd)) throw new Error();
+
       const metadata = this.#getCommandMetadata(Cmd);
       if (!metadata) continue;
+
       const instance = new Cmd();
       this.commandMap.set(metadata.data.name, instance);
       this.commandMetadata.set(metadata.data.name, metadata);

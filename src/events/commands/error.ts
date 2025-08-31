@@ -2,7 +2,7 @@ import { CommandContext, Event } from '#framework';
 import { MessageFlags, type AutocompleteInteraction } from 'discord.js';
 import { logger } from '../../common/logger.ts';
 
-export class CommandErrorEvent {
+export class CommandErrorEvents {
   @Event('commandError')
   async command(i: CommandContext, err: Error) {
     logger.error(err);

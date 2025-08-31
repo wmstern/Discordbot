@@ -8,7 +8,7 @@ import { MessageFlags } from 'discord.js';
 
 export class CommandBlockEvent {
   @Event('commandBlock')
-  async run(i: CommandContext, { reason, context }: FilterResponse) {
+  async onCooldown(i: CommandContext, { reason, context }: FilterResponse) {
     if (reason === 'cooldown') {
       const cooldown = context as CooldownObject;
       const remaining = (
