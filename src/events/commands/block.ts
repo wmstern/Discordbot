@@ -3,7 +3,9 @@ import { MessageFlags, type CommandInteraction } from 'discord.js';
 
 export class CommandBlockEvent {
   @Event('commandBlock')
-  async onCooldown(i: CommandInteraction, { reason, context }: FilterResponse) {
+  async onBlock(i: CommandInteraction, { reason, context }: FilterResponse) {
+    const replied = i.replied || i.deferred;
+
     if (reason === 'cooldown') {
       const cooldown = context as CooldownObject;
       const remaining = (
@@ -11,10 +13,13 @@ export class CommandBlockEvent {
         1000
       ).toFixed(1);
 
-      const replied = i.replied || i.deferred;
-
       await i[replied ? 'followUp' : 'reply']({
         content: `You must wait ${remaining} seconds before using this command again.`,
+        flags: MessageFlags.Ephemeral
+      });
+    } else {
+      await i[replied ? 'followUp' : 'reply']({
+        content: String(context),
         flags: MessageFlags.Ephemeral
       });
     }
