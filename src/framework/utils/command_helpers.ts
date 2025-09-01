@@ -1,7 +1,6 @@
 import { ApplicationCommandType } from 'discord.js';
 import type {
   AutocompleteMethod,
-  CommandContext,
   CommandMetadata,
   CommandMethod,
   CommandMethodMetadata
@@ -10,7 +9,7 @@ import type {
 export function isCommandMethod(
   metadata: CommandMethodMetadata,
   method: unknown
-): method is CommandMethod<CommandContext> {
+): method is CommandMethod {
   return (
     typeof method === 'function' &&
     method.length === 1 &&

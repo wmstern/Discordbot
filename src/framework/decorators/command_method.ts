@@ -1,7 +1,7 @@
-import { ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandType, type CommandInteraction } from 'discord.js';
 import type {
   AutocompleteMethod,
-  CommandContext,
+  CommandMetadata,
   CommandMethod,
   CommandMethodFilter,
   CommandMethodMetadata
@@ -9,10 +9,14 @@ import type {
 
 export const DEFAULT_METHOD = '/';
 
+interface Context extends Omit<DecoratorContext, 'metadata'> {
+  metadata: Partial<CommandMetadata>;
+}
+
 export function Execute(name?: string) {
-  return <T extends CommandContext>(
+  return <T extends CommandInteraction>(
     _target: CommandMethod<T>,
-    context: DecoratorContext
+    context: Context
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
@@ -31,9 +35,9 @@ export function Execute(name?: string) {
 }
 
 export function Cooldown(time: number) {
-  return <T extends CommandContext>(
+  return <T extends CommandInteraction>(
     _target: CommandMethod<T>,
-    context: DecoratorContext
+    context: Context
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
@@ -47,9 +51,9 @@ export function Cooldown(time: number) {
 }
 
 export function DeferReply(defer = true) {
-  return <T extends CommandContext>(
+  return <T extends CommandInteraction>(
     _target: CommandMethod<T>,
-    context: DecoratorContext
+    context: Context
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
@@ -62,10 +66,10 @@ export function DeferReply(defer = true) {
   };
 }
 
-export function Filters(...filters: CommandMethodFilter<CommandContext>[]) {
-  return <T extends CommandContext>(
+export function Filters(...filters: CommandMethodFilter[]) {
+  return <T extends CommandInteraction>(
     _target: CommandMethod<T>,
-    context: DecoratorContext
+    context: Context
   ) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
@@ -81,7 +85,7 @@ export function Filters(...filters: CommandMethodFilter<CommandContext>[]) {
 }
 
 export function Autocomplete() {
-  return (_target: AutocompleteMethod, context: DecoratorContext) => {
+  return (_target: AutocompleteMethod, context: Context) => {
     if (context.kind !== 'method' || typeof context.name !== 'string')
       throw new Error();
     if (context.metadata.type !== ApplicationCommandType.ChatInput)
@@ -95,7 +99,7 @@ export function Autocomplete() {
 }
 
 function getMethods(
-  context: ClassMethodDecoratorContext
+  context: Context
 ): Partial<CommandMethodMetadata>[] | undefined {
   context.metadata.methods ??= [];
   const methods = context.metadata.methods as Partial<CommandMethodMetadata>[];

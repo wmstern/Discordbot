@@ -1,14 +1,9 @@
-import {
-  Event,
-  type CommandContext,
-  type CooldownObject,
-  type FilterResponse
-} from '#framework';
-import { MessageFlags } from 'discord.js';
+import { Event, type CooldownObject, type FilterResponse } from '#framework';
+import { MessageFlags, type CommandInteraction } from 'discord.js';
 
 export class CommandBlockEvent {
   @Event('commandBlock')
-  async onCooldown(i: CommandContext, { reason, context }: FilterResponse) {
+  async onCooldown(i: CommandInteraction, { reason, context }: FilterResponse) {
     if (reason === 'cooldown') {
       const cooldown = context as CooldownObject;
       const remaining = (

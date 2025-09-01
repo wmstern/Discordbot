@@ -1,29 +1,25 @@
 import type {
   ApplicationCommandType,
   AutocompleteInteraction,
-  ChatInputCommandInteraction,
   Client,
   CommandInteraction,
-  ContextMenuCommandInteraction,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   RESTPostAPIContextMenuApplicationCommandsJSONBody
 } from 'discord.js';
 
-export type CommandContext =
-  | CommandInteraction
-  | ChatInputCommandInteraction
-  | ContextMenuCommandInteraction;
-
 export type AutocompleteMethod = (i: AutocompleteInteraction) => unknown;
-export type CommandMethod<T extends CommandContext> = (
+export type CommandMethod<T extends CommandInteraction = CommandInteraction> = (
   interaction: T
 ) => unknown;
 
 export type CommandBase = Record<
   PropertyKey,
-  CommandMethod<CommandContext> | AutocompleteMethod
+  CommandMethod | AutocompleteMethod
 >;
-export type CommandConstructor = new (client?: Client) => CommandBase;
+export interface CommandConstructor {
+  new (client?: Client): CommandBase;
+  [Symbol.metadata]?: CommandMetadata;
+}
 
 export interface FilterResponse {
   block: boolean;
@@ -34,16 +30,16 @@ export type CommandMethodFilterResponse =
   | (FilterResponse | boolean)
   | Promise<FilterResponse | boolean>;
 
-export type CommandMethodFilter<T extends CommandContext> = (
-  interaction: T
-) => CommandMethodFilterResponse;
+export type CommandMethodFilter<
+  T extends CommandInteraction = CommandInteraction
+> = (interaction: T) => CommandMethodFilterResponse;
 
 export interface CommandMethodMetadata {
   methodName: string;
   name: string;
   cooldown?: number;
   defer?: boolean;
-  filters: CommandMethodFilter<CommandContext>[];
+  filters: CommandMethodFilter[];
 }
 
 export interface SlashCommandAutocompleteMetadata {

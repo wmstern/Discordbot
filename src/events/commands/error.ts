@@ -1,22 +1,22 @@
-import { CommandContext, Event } from '#framework';
-import { MessageFlags, type AutocompleteInteraction } from 'discord.js';
+import { Event } from '#framework';
+import {
+  MessageFlags,
+  type AutocompleteInteraction,
+  type CommandInteraction
+} from 'discord.js';
 import { logger } from '../../common/logger.ts';
 
 export class CommandErrorEvents {
   @Event('commandError')
-  async command(i: CommandContext, err: Error) {
+  async command(i: CommandInteraction, err: Error) {
     logger.error(err);
 
-    if (i.replied || i.deferred)
-      await i.followUp({
-        content: 'There was an error while executing this command.',
-        flags: MessageFlags.Ephemeral
-      });
-    else
-      await i.reply({
-        content: 'There was an error while executing this command.',
-        flags: MessageFlags.Ephemeral
-      });
+    const replied = i.replied || i.deferred;
+
+    await i[replied ? 'followUp' : 'reply']({
+      content: 'There was an error while executing this command.',
+      flags: MessageFlags.Ephemeral
+    });
   }
 
   @Event('autocompleteError')

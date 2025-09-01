@@ -43,7 +43,7 @@ export class CommandHandler {
   #getCommandMetadata(
     Command: CommandConstructor
   ): CommandMetadata | undefined {
-    const metadata = Command[Symbol.metadata] as CommandMetadata | null;
+    const metadata = Command[Symbol.metadata];
     if (!metadata?.data) return;
 
     for (const method of metadata.methods)
@@ -114,7 +114,7 @@ export class CommandHandler {
       let response = await filter(i);
 
       if (typeof response === 'boolean') {
-        response = { block: response, reason: undefined, context: null };
+        response = { block: response };
       }
 
       if (response.block) {
