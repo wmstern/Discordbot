@@ -66,7 +66,9 @@ export function DeferReply(defer = true) {
   };
 }
 
-export function Filters(...filters: CommandMethodFilter[]) {
+export function Filters<F extends CommandInteraction>(
+  ...filters: CommandMethodFilter<F>[]
+) {
   return <T extends CommandInteraction>(
     _target: CommandMethod<T>,
     context: Context
@@ -79,7 +81,10 @@ export function Filters(...filters: CommandMethodFilter[]) {
 
     const method = ensureMethod(methods, context.name);
     if (method) {
-      method.filters = [...(method.filters ?? []), ...filters];
+      method.filters = [
+        ...(method.filters ?? []),
+        ...(filters as CommandMethodFilter[])
+      ];
     }
   };
 }

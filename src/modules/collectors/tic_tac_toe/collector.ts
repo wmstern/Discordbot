@@ -6,9 +6,10 @@ import {
 } from 'discord.js';
 import { EndReasons } from '../../domain/tic_tac_toe/constants.ts';
 import type { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
+import type { GameManager } from '../../services/games/manager.ts';
 
 export class TTTCollector {
-  create(msg: Message, game: GameLogic, games: Set<string>) {
+  create(msg: Message, game: GameLogic, games: GameManager) {
     const collector = msg.createMessageComponentCollector({
       idle: 180_000,
       componentType: ComponentType.Button
@@ -40,7 +41,7 @@ export class TTTCollector {
       collected: ReadonlyCollection<string, ButtonInteraction>,
       reason: string
     ) => {
-      games.delete(msg.channelId);
+      games.removeGame(msg.channelId);
 
       const i = collected.last();
 

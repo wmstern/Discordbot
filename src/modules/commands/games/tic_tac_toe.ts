@@ -7,8 +7,9 @@ import {
 import { TTTCollector } from '../../collectors/tic_tac_toe/collector.ts';
 import { Difficulties } from '../../domain/tic_tac_toe/constants.ts';
 import { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
+import { GameManager } from '../../services/games/manager.ts';
 
-const games = new Set<string>();
+const manager = new GameManager();
 const collector = new TTTCollector();
 
 @Command(
@@ -40,15 +41,13 @@ export class TTTCommand {
   async run(i: ChatInputCommandInteraction) {
     const channel = i.channelId;
 
-    if (games.has(channel)) {
+    if (manager.hasGame(channel)) {
       await i.followUp({
-        content: 'Ya hay una partida activa en este canal.',
+        content: 'Ya hay una partida en el canal.',
         flags: MessageFlags.Ephemeral
       });
       return;
     }
-
-    games.add(channel);
 
     const player1 = i.user;
     const player2 = i.options.getUser('adversario', false) ?? i.client.user;
@@ -58,11 +57,13 @@ export class TTTCommand {
 
     const game = new GameLogic(player1, player2, difficulty);
 
+    manager.addGame(channel, game);
+
     const msg = await i.editReply({
       content: `Turno de ${game.currentPlayer.username}`,
       components: game.renderBoard(false)
     });
 
-    collector.create(msg, game, games);
+    collector.create(msg, game, manager);
   }
 }
