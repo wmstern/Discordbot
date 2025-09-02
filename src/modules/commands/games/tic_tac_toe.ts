@@ -4,9 +4,9 @@ import {
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from 'discord.js';
-import { TTTCollector } from '../../services/tic_tac_toe/collector.ts';
-import GameLogic from '../../services/tic_tac_toe/logic.ts';
-import { Difficulties } from '../../types/ttt.types.ts';
+import { TTTCollector } from '../../collectors/tic_tac_toe/collector.ts';
+import { Difficulties } from '../../domain/tic_tac_toe/constants.ts';
+import { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
 
 const games = new Set<string>();
 const collector = new TTTCollector();

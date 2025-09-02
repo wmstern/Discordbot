@@ -1,6 +1,6 @@
 import { Event } from '#framework';
 import type { Client } from 'discord.js';
-import { logger } from '../common/logger.ts';
+import { logger } from '../../common/logger.ts';
 
 export class ClientEvents {
   @Event('ready')

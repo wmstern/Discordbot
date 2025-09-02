@@ -4,8 +4,8 @@ import {
   type Message,
   type ReadonlyCollection
 } from 'discord.js';
-import { EndReasons } from '../../types/ttt.types.ts';
-import type GameLogic from './logic.ts';
+import { EndReasons } from '../../domain/tic_tac_toe/constants.ts';
+import type { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
 
 export class TTTCollector {
   create(msg: Message, game: GameLogic, games: Set<string>) {

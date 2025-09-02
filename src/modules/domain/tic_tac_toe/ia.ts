@@ -1,7 +1,7 @@
-import { Difficulties } from '../../types/ttt.types.ts';
-import GameLogic from './logic.ts';
+import { Difficulties } from './constants.ts';
+import { GameLogic } from './logic.ts';
 
-export default class GameIA {
+export class GameIA {
   public readonly game: GameLogic;
   public readonly difficulty: Difficulties;
 
