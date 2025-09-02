@@ -1,5 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
-import { Emojis, EndReasons, type Difficulties } from './constants.ts';
+import {
+  BoardCell,
+  Emojis,
+  EndReasons,
+  Turns,
+  type Difficulties
+} from './constants.ts';
 import { GameIA } from './ia.ts';
 import type { Board, Line, Response } from './types.ts';
 
@@ -9,7 +15,7 @@ export class GameLogic {
 
   public readonly bot?: GameIA;
 
-  turn: 0 | 1;
+  turn: Turns;
   winner?: User;
 
   public readonly board: Board = [
@@ -22,13 +28,13 @@ export class GameLogic {
     this.player1 = player1;
     this.player2 = player2;
     if (player2.bot) {
-      this.turn = 0;
+      this.turn = Turns.PLAYER_1;
       this.bot = new GameIA(this, difficulty);
-    } else this.turn = Math.floor(Math.random() * 2) as 0 | 1;
+    } else this.turn = Math.floor(Math.random() * 2) as Turns;
   }
 
   get currentPlayer(): User {
-    return this.turn === 0 ? this.player1 : this.player2;
+    return this.turn === Turns.PLAYER_1 ? this.player1 : this.player2;
   }
 
   get winnerPlayer(): User | undefined {
@@ -56,14 +62,20 @@ export class GameLogic {
 
     let endReason: EndReasons | undefined;
     if (this.checkWin()) endReason = EndReasons.WIN;
-    if (this.board.every((row) => row.every((cell) => cell !== 0)))
+    else if (
+      this.board.every((row) => row.every((cell) => cell !== BoardCell.NULL))
+    )
       endReason = EndReasons.TIE;
 
     if (!endReason && placed) {
       if (this.bot) {
         this.bot.move();
         if (this.checkWin()) endReason = EndReasons.WIN;
-        if (this.board.every((row) => row.every((cell) => cell !== 0)))
+        else if (
+          this.board.every((row) =>
+            row.every((cell) => cell !== BoardCell.NULL)
+          )
+        )
           endReason = EndReasons.TIE;
       } else this.nextTurn();
     }
@@ -79,21 +91,23 @@ export class GameLogic {
   }
 
   placeMarker(x: number, y: number): boolean {
-    if (this.board[y][x] !== 0) return false;
-    this.board[y][x] = this.turn === 0 ? 1 : 2;
+    if (this.board[y][x] !== BoardCell.NULL) return false;
+    this.board[y][x] =
+      this.turn === Turns.PLAYER_1 ? BoardCell.PLAYER_1 : BoardCell.PLAYER_2;
     return true;
   }
 
   nextTurn(): void {
-    this.turn = this.turn === 0 ? 1 : 0;
+    this.turn = this.turn === Turns.PLAYER_1 ? Turns.PLAYER_2 : Turns.PLAYER_1;
   }
 
   checkWin(): boolean {
     const lines = this.lines;
 
     for (const line of lines) {
-      if (line[0] !== 0 && line.every((v) => v === line[0])) {
-        this.winner = line[0] === 1 ? this.player1 : this.player2;
+      if (line[0] !== BoardCell.NULL && line.every((v) => v === line[0])) {
+        this.winner =
+          line[0] === BoardCell.PLAYER_1 ? this.player1 : this.player2;
         return true;
       }
     }
@@ -103,14 +117,16 @@ export class GameLogic {
 
   getPlayerAt(x: number, y: number): User | undefined {
     const val = this.board[y][x];
-    if (val === 1) return this.player1;
-    if (val === 2) return this.player2;
+    if (val === BoardCell.PLAYER_1) return this.player1;
+    if (val === BoardCell.PLAYER_2) return this.player2;
     return undefined;
   }
 
   getFreeCells(): { x: number; y: number }[] {
     return this.board
-      .flatMap((row, y) => row.map((cell, x) => (cell === 0 ? { y, x } : null)))
+      .flatMap((row, y) =>
+        row.map((cell, x) => (cell === BoardCell.NULL ? { y, x } : null))
+      )
       .filter((v) => v !== null);
   }
 
@@ -121,8 +137,8 @@ export class GameLogic {
           new ButtonBuilder()
             .setStyle(2)
             .setLabel(Emojis[cell])
-            .setCustomId(`tic-tac-toe_${x.toString()}_${y.toString()}`)
-            .setDisabled(ended || cell !== 0)
+            .setCustomId(`tic-tac-toe_${String(x)}_${String(y)}`)
+            .setDisabled(ended || cell !== BoardCell.NULL)
         )
       )
     );

@@ -1,4 +1,4 @@
-import { Difficulties } from './constants.ts';
+import { Difficulties, BoardCell } from './constants.ts';
 import { GameLogic } from './logic.ts';
 
 export class GameIA {
@@ -25,7 +25,7 @@ export class GameIA {
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return null;
     const choice = freeCells[Math.floor(Math.random() * freeCells.length)];
-    game.board[choice.y][choice.x] = 2;
+    game.board[choice.y][choice.x] = BoardCell.PLAYER_2;
     return choice;
   }
 
@@ -34,23 +34,21 @@ export class GameIA {
     if (freeCells.length === 0) return null;
 
     for (const cell of freeCells) {
-      game.board[cell.y][cell.x] = 2;
+      game.board[cell.y][cell.x] = BoardCell.PLAYER_2;
       if (game.checkWin()) return cell;
-      game.board[cell.y][cell.x] = 0;
+      game.board[cell.y][cell.x] = BoardCell.NULL;
     }
 
     for (const cell of freeCells) {
-      game.board[cell.y][cell.x] = 1;
+      game.board[cell.y][cell.x] = BoardCell.PLAYER_1;
       if (game.checkWin()) {
-        game.board[cell.y][cell.x] = 2;
+        game.board[cell.y][cell.x] = BoardCell.PLAYER_2;
         return cell;
       }
-      game.board[cell.y][cell.x] = 0;
+      game.board[cell.y][cell.x] = BoardCell.NULL;
     }
 
-    const choice = freeCells[Math.floor(Math.random() * freeCells.length)];
-    game.board[choice.y][choice.x] = 2;
-    return choice;
+    return this.easyMove(game);
   }
 
   hardMove(game: GameLogic) {
@@ -61,16 +59,16 @@ export class GameIA {
     let bestMove = freeCells[0];
 
     for (const cell of freeCells) {
-      game.board[cell.y][cell.x] = 2;
+      game.board[cell.y][cell.x] = BoardCell.PLAYER_2;
       const score = this.minimax(game, false);
-      game.board[cell.y][cell.x] = 0;
+      game.board[cell.y][cell.x] = BoardCell.NULL;
       if (score > bestScore) {
         bestScore = score;
         bestMove = cell;
       }
     }
 
-    game.board[bestMove.y][bestMove.x] = 2;
+    game.board[bestMove.y][bestMove.x] = BoardCell.PLAYER_2;
     return bestMove;
   }
 
@@ -81,9 +79,11 @@ export class GameIA {
 
     const scores: number[] = [];
     for (const cell of freeCells) {
-      game.board[cell.y][cell.x] = isBot ? 2 : 1;
+      game.board[cell.y][cell.x] = isBot
+        ? BoardCell.PLAYER_2
+        : BoardCell.PLAYER_1;
       scores.push(this.minimax(game, !isBot));
-      game.board[cell.y][cell.x] = 0;
+      game.board[cell.y][cell.x] = BoardCell.NULL;
     }
 
     return isBot ? Math.max(...scores) : Math.min(...scores);
