@@ -15,7 +15,7 @@
     "allowJs": true,
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "lib": ["ESNext", "ESNext.Decorators"],
@@ -24,6 +24,6 @@
     "pretty": true,
     "noEmit": true
   },
-  "include": ["src/**/*", "src/commands/utils/ping.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "__tests__"]
 }
