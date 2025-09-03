@@ -9,7 +9,7 @@ import { Difficulties } from '../../domain/tic_tac_toe/constants.ts';
 import { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
 import { GameManager } from '../../services/games/manager.ts';
 
-const manager = new GameManager();
+const manager = new GameManager(GameLogic);
 const collector = new TTTCollector();
 
 @Command(

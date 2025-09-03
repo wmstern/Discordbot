@@ -9,7 +9,7 @@ import type { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
 import type { GameManager } from '../../services/games/manager.ts';
 
 export class TTTCollector {
-  create(msg: Message, game: GameLogic, games: GameManager) {
+  create(msg: Message, game: GameLogic, games: GameManager<typeof GameLogic>) {
     const collector = msg.createMessageComponentCollector({
       idle: 180_000,
       componentType: ComponentType.Button
