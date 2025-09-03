@@ -58,36 +58,32 @@ export class GameLogic {
   }
 
   playMove(x: number, y: number): Response {
-    const placed = this.placeMarker(x, y);
+    const response: Partial<Response> = {};
+    response.placed = this.placeMarker(x, y);
 
-    let endReason: EndReasons | undefined;
-    if (this.checkWin()) endReason = EndReasons.WIN;
+    if (this.checkWin()) response.endReason = EndReasons.WIN;
     else if (
       this.board.every((row) => row.every((cell) => cell !== BoardCell.NULL))
     )
-      endReason = EndReasons.TIE;
+      response.endReason = EndReasons.TIE;
 
-    if (!endReason && placed) {
+    if (!response.endReason && response.placed) {
       if (this.bot) {
         this.bot.move();
-        if (this.checkWin()) endReason = EndReasons.WIN;
+        if (this.checkWin()) response.endReason = EndReasons.WIN;
         else if (
           this.board.every((row) =>
             row.every((cell) => cell !== BoardCell.NULL)
           )
         )
-          endReason = EndReasons.TIE;
+          response.endReason = EndReasons.TIE;
       } else this.nextTurn();
     }
 
-    let ended = false;
-    if (endReason) ended = true;
+    if (response.endReason) response.ended = true;
+    else response.ended = false;
 
-    return {
-      placed,
-      ended,
-      endReason
-    };
+    return response as Response;
   }
 
   placeMarker(x: number, y: number): boolean {

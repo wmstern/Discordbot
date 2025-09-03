@@ -20,6 +20,8 @@ export class TTTCollector {
       await i.deferUpdate();
 
       const [, xStr, yStr] = i.customId.split('_');
+      if (!xStr || !yStr) return;
+
       const x = parseInt(xStr);
       const y = parseInt(yStr);
 

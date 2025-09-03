@@ -1,29 +1,39 @@
 {
   "compilerOptions": {
-    "strict": true,
     "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "strict": true,
+
+    "allowArbitraryExtensions": false,
+    "allowImportingTsExtensions": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
+    "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
-    "rootDir": ".",
-    "allowJs": true,
+
+    "newLine": "lf",
     "outDir": "dist",
+    "rootDir": "src",
+    "noEmit": true,
+
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+
     "lib": ["ESNext", "ESNext.Decorators"],
     "target": "esnext",
-    "useDefineForClassFields": true,
-    "pretty": true,
-    "noEmit": true
+    "useDefineForClassFields": true
   },
-  "include": ["src/**/*"],
+  "include": ["**/*"],
   "exclude": ["node_modules", "dist", "__tests__"]
 }

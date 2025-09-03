@@ -5,8 +5,7 @@ import {
   type ChatInputCommandInteraction
 } from 'discord.js';
 
-const KEY = 'GLOBAL';
-const embeds: Record<PropertyKey, EmbedBuilder> = {};
+const embed = new EmbedBuilder();
 
 @Command(
   new SlashCommandBuilder()
@@ -17,18 +16,17 @@ export class HelpCommand {
   @Execute()
   @Cooldown(6000)
   async run(i: ChatInputCommandInteraction) {
-    if (!(KEY in embeds)) {
-      embeds.global = new EmbedBuilder();
+    if (!('description' in embed.data)) {
       const commands = await (
         await i.client.application.fetch()
       ).commands.fetch();
-      embeds.global.setDescription(
+      embed.setDescription(
         '```\n' + commands.map((cmd) => `/${cmd.name}`).join('\n') + '\n```'
       );
     }
 
     await i.reply({
-      embeds: [embeds.global]
+      embeds: [embed]
     });
   }
 }

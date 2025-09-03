@@ -14,6 +14,9 @@ export class EventHandler {
   #getEventsStructures() {
     for (const Ev of this.evs) {
       if (typeof Ev !== 'function' || !('prototype' in Ev)) continue;
+
+      const instance = new Ev(Ev.length === 1 ? this.client : undefined);
+
       for (const key of Object.getOwnPropertyNames(Ev.prototype)) {
         if (key === 'constructor') continue;
         if (typeof (Ev.prototype as EventBase)[key] !== 'function') continue;
@@ -24,8 +27,9 @@ export class EventHandler {
         if (!name) continue;
         this.events.add(name);
 
-        const instance = new Ev(Ev.length === 1 ? this.client : undefined);
         const fn = instance[key];
+        if (typeof fn !== 'function') continue;
+
         this.client.on(name, (...args) => void fn(...args));
       }
     }
