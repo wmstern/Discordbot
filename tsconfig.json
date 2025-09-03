@@ -7,7 +7,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "module": "esnext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "nodenext",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "resolvePackageJsonImports": true,
