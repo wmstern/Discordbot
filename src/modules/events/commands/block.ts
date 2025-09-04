@@ -8,10 +8,7 @@ export class CommandBlockEvent {
 
     if (reason === 'cooldown') {
       const cooldown = context as CooldownObject;
-      const remaining = (
-        (cooldown.start + cooldown.time - Date.now()) /
-        1000
-      ).toFixed(1);
+      const remaining = ((cooldown.start + cooldown.time - Date.now()) / 1000).toFixed(1);
 
       await i[replied ? 'followUp' : 'reply']({
         content: `You must wait ${remaining} seconds before using this command again.`,

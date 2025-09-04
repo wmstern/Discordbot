@@ -14,17 +14,12 @@ interface Context extends Omit<DecoratorContext, 'metadata'> {
 }
 
 export function Execute(name?: string) {
-  return <T extends CommandInteraction>(
-    _target: CommandMethod<T>,
-    context: Context
-  ) => {
-    if (context.kind !== 'method' || typeof context.name !== 'string')
-      throw new Error();
+  return <T extends CommandInteraction>(_target: CommandMethod<T>, context: Context) => {
+    if (context.kind !== 'method' || typeof context.name !== 'string') throw new Error();
     const methods = getMethods(context);
     if (!methods) return;
 
-    if (methods.some((m) => m.name === (name ?? DEFAULT_METHOD)))
-      throw new Error();
+    if (methods.some((m) => m.name === (name ?? DEFAULT_METHOD))) throw new Error();
 
     const method = ensureMethod(methods, context.name);
     if (method) {
@@ -35,12 +30,8 @@ export function Execute(name?: string) {
 }
 
 export function Cooldown(time: number) {
-  return <T extends CommandInteraction>(
-    _target: CommandMethod<T>,
-    context: Context
-  ) => {
-    if (context.kind !== 'method' || typeof context.name !== 'string')
-      throw new Error();
+  return <T extends CommandInteraction>(_target: CommandMethod<T>, context: Context) => {
+    if (context.kind !== 'method' || typeof context.name !== 'string') throw new Error();
 
     const methods = getMethods(context);
     if (!methods) return;
@@ -51,12 +42,8 @@ export function Cooldown(time: number) {
 }
 
 export function DeferReply(defer = true) {
-  return <T extends CommandInteraction>(
-    _target: CommandMethod<T>,
-    context: Context
-  ) => {
-    if (context.kind !== 'method' || typeof context.name !== 'string')
-      throw new Error();
+  return <T extends CommandInteraction>(_target: CommandMethod<T>, context: Context) => {
+    if (context.kind !== 'method' || typeof context.name !== 'string') throw new Error();
 
     const methods = getMethods(context);
     if (!methods) return;
@@ -66,35 +53,24 @@ export function DeferReply(defer = true) {
   };
 }
 
-export function Filters<F extends CommandInteraction>(
-  ...filters: CommandMethodFilter<F>[]
-) {
-  return <T extends CommandInteraction>(
-    _target: CommandMethod<T>,
-    context: Context
-  ) => {
-    if (context.kind !== 'method' || typeof context.name !== 'string')
-      throw new Error();
+export function Filters<F extends CommandInteraction>(...filters: CommandMethodFilter<F>[]) {
+  return <T extends CommandInteraction>(_target: CommandMethod<T>, context: Context) => {
+    if (context.kind !== 'method' || typeof context.name !== 'string') throw new Error();
 
     const methods = getMethods(context);
     if (!methods) return;
 
     const method = ensureMethod(methods, context.name);
     if (method) {
-      method.filters = [
-        ...(method.filters ?? []),
-        ...(filters as CommandMethodFilter[])
-      ];
+      method.filters = [...(method.filters ?? []), ...(filters as CommandMethodFilter[])];
     }
   };
 }
 
 export function Autocomplete() {
   return (_target: AutocompleteMethod, context: Context) => {
-    if (context.kind !== 'method' || typeof context.name !== 'string')
-      throw new Error();
-    if (context.metadata.type !== ApplicationCommandType.ChatInput)
-      throw new Error();
+    if (context.kind !== 'method' || typeof context.name !== 'string') throw new Error();
+    if (context.metadata.type !== ApplicationCommandType.ChatInput) throw new Error();
     if (context.metadata.autocomplete) throw new Error();
 
     context.metadata.autocomplete = {
@@ -103,9 +79,7 @@ export function Autocomplete() {
   };
 }
 
-function getMethods(
-  context: Context
-): Partial<CommandMethodMetadata>[] | undefined {
+function getMethods(context: Context): Partial<CommandMethodMetadata>[] | undefined {
   context.metadata.methods ??= [];
   const methods = context.metadata.methods as Partial<CommandMethodMetadata>[];
   return methods;

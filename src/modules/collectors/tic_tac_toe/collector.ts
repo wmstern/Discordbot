@@ -65,9 +65,6 @@ export class TTTCollector {
     };
 
     collector.on('collect', (i) => void handleCollect(i));
-    collector.on(
-      'end',
-      (collected, reason) => void handleEnd(collected, reason)
-    );
+    collector.on('end', (collected, reason) => void handleEnd(collected, reason));
   }
 }

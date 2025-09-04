@@ -12,10 +12,7 @@ export type CommandMethod<T extends CommandInteraction = CommandInteraction> = (
   interaction: T
 ) => unknown;
 
-export type CommandBase = Record<
-  PropertyKey,
-  CommandMethod | AutocompleteMethod
->;
+export type CommandBase = Record<PropertyKey, CommandMethod | AutocompleteMethod>;
 export interface CommandConstructor {
   new (client?: Client): CommandBase;
   [Symbol.metadata]?: CommandMetadata;
@@ -30,9 +27,9 @@ export type CommandMethodFilterResponse =
   | (FilterResponse | boolean)
   | Promise<FilterResponse | boolean>;
 
-export type CommandMethodFilter<
-  T extends CommandInteraction = CommandInteraction
-> = (interaction: T) => CommandMethodFilterResponse;
+export type CommandMethodFilter<T extends CommandInteraction = CommandInteraction> = (
+  interaction: T
+) => CommandMethodFilterResponse;
 
 export interface CommandMethodMetadata {
   methodName: string;

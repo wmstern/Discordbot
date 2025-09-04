@@ -1,11 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
-import {
-  BoardCell,
-  Emojis,
-  EndReasons,
-  Turns,
-  type Difficulties
-} from './constants.ts';
+import { BoardCell, Emojis, EndReasons, Turns, type Difficulties } from './constants.ts';
 import { GameIA } from './ia.ts';
 import type { Board, Line, Response } from './types.ts';
 
@@ -62,20 +56,14 @@ export class GameLogic {
     response.placed = this.placeMarker(x, y);
 
     if (this.checkWin()) response.endReason = EndReasons.WIN;
-    else if (
-      this.board.every((row) => row.every((cell) => cell !== BoardCell.NULL))
-    )
+    else if (this.board.every((row) => row.every((cell) => cell !== BoardCell.NULL)))
       response.endReason = EndReasons.TIE;
 
     if (!response.endReason && response.placed) {
       if (this.bot) {
         this.bot.move();
         if (this.checkWin()) response.endReason = EndReasons.WIN;
-        else if (
-          this.board.every((row) =>
-            row.every((cell) => cell !== BoardCell.NULL)
-          )
-        )
+        else if (this.board.every((row) => row.every((cell) => cell !== BoardCell.NULL)))
           response.endReason = EndReasons.TIE;
       } else this.nextTurn();
     }
@@ -88,8 +76,7 @@ export class GameLogic {
 
   placeMarker(x: number, y: number): boolean {
     if (this.board[y][x] !== BoardCell.NULL) return false;
-    this.board[y][x] =
-      this.turn === Turns.PLAYER_1 ? BoardCell.PLAYER_1 : BoardCell.PLAYER_2;
+    this.board[y][x] = this.turn === Turns.PLAYER_1 ? BoardCell.PLAYER_1 : BoardCell.PLAYER_2;
     return true;
   }
 
@@ -102,8 +89,7 @@ export class GameLogic {
 
     for (const line of lines) {
       if (line[0] !== BoardCell.NULL && line.every((v) => v === line[0])) {
-        this.winner =
-          line[0] === BoardCell.PLAYER_1 ? this.player1 : this.player2;
+        this.winner = line[0] === BoardCell.PLAYER_1 ? this.player1 : this.player2;
         return true;
       }
     }
@@ -120,9 +106,7 @@ export class GameLogic {
 
   getFreeCells(): { x: number; y: number }[] {
     return this.board
-      .flatMap((row, y) =>
-        row.map((cell, x) => (cell === BoardCell.NULL ? { y, x } : null))
-      )
+      .flatMap((row, y) => row.map((cell, x) => (cell === BoardCell.NULL ? { y, x } : null)))
       .filter((v) => v !== null);
   }
 

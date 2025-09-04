@@ -8,11 +8,7 @@ declare module 'discord.js' {
       error: Error,
       metadata: CommandMetadata
     ];
-    commandError: [
-      interaction: CommandInteraction,
-      error: Error,
-      metadata: CommandMetadata
-    ];
+    commandError: [interaction: CommandInteraction, error: Error, metadata: CommandMetadata];
     commandBlock: [
       interaction: CommandInteraction,
       response: FilterResponse,

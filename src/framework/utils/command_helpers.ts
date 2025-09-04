@@ -10,11 +10,7 @@ export function isCommandMethod(
   metadata: CommandMethodMetadata,
   method: unknown
 ): method is CommandMethod {
-  return (
-    typeof method === 'function' &&
-    method.length === 1 &&
-    metadata.methodName === method.name
-  );
+  return typeof method === 'function' && method.length === 1 && metadata.methodName === method.name;
 }
 
 export function isAutocomplete(

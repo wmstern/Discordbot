@@ -79,9 +79,7 @@ export class GameIA {
 
     const scores: number[] = [];
     for (const cell of freeCells) {
-      game.board[cell.y][cell.x] = isBot
-        ? BoardCell.PLAYER_2
-        : BoardCell.PLAYER_1;
+      game.board[cell.y][cell.x] = isBot ? BoardCell.PLAYER_2 : BoardCell.PLAYER_1;
       scores.push(this.minimax(game, !isBot));
       game.board[cell.y][cell.x] = BoardCell.NULL;
     }

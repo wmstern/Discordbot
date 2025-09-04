@@ -11,9 +11,7 @@ export const FrameworkFactory = {
   async create(path: string, options: ClientOptions): Promise<App> {
     const client = new Client(options);
 
-    const commands = await getExports<CommandConstructor>(
-      join(path, 'commands')
-    );
+    const commands = await getExports<CommandConstructor>(join(path, 'commands'));
     const events = await getExports<EventConstructor>(join(path, 'events'));
 
     const commandHandler = new CommandHandler(client, commands);

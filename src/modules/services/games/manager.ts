@@ -2,18 +2,13 @@ import type { GameLogic as TTT } from '../../domain/tic_tac_toe/logic.ts';
 
 type GameConstructor = typeof TTT;
 
-export class GameManager<
-  T extends GameConstructor,
-  I extends InstanceType<T> = InstanceType<T>
-> {
+export class GameManager<T extends GameConstructor, I extends InstanceType<T> = InstanceType<T>> {
   static games = new Map<string, InstanceType<GameConstructor>>();
 
   constructor(public readonly gameClass: T) {}
 
   get games(): Map<string, I> {
-    return GameManager.filterGames(
-      (_, v) => v instanceof this.gameClass
-    ) as Map<string, I>;
+    return GameManager.filterGames((_, v) => v instanceof this.gameClass) as Map<string, I>;
   }
 
   addGame(id: string, game: I) {
@@ -50,17 +45,11 @@ export class GameManager<
   }
 
   filterGames(callback: (key: string, value: I) => boolean) {
-    return new Map(
-      Array(...this.games).filter(([key, value]) => callback(key, value))
-    );
+    return new Map(Array(...this.games).filter(([key, value]) => callback(key, value)));
   }
 
-  static filterGames(
-    callback: (key: string, value: InstanceType<GameConstructor>) => boolean
-  ) {
-    return new Map(
-      Array(...GameManager.games).filter(([key, value]) => callback(key, value))
-    );
+  static filterGames(callback: (key: string, value: InstanceType<GameConstructor>) => boolean) {
+    return new Map(Array(...GameManager.games).filter(([key, value]) => callback(key, value)));
   }
 
   hasGame(id: string) {

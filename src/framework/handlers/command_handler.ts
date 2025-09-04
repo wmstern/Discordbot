@@ -40,15 +40,12 @@ export class CommandHandler {
     }
   }
 
-  #getCommandMetadata(
-    Command: CommandConstructor
-  ): CommandMetadata | undefined {
+  #getCommandMetadata(Command: CommandConstructor): CommandMetadata | undefined {
     const metadata = Command[Symbol.metadata];
     if (!metadata?.data) return;
 
     for (const method of metadata.methods)
-      if (method.cooldown)
-        this.cooldowns.set(metadata.data.name + method.name, new Map());
+      if (method.cooldown) this.cooldowns.set(metadata.data.name + method.name, new Map());
 
     return metadata;
   }
@@ -77,11 +74,7 @@ export class CommandHandler {
     }
   }
 
-  async #commandExecute(
-    i: CommandInteraction,
-    instance: CommandBase,
-    metadata: CommandMetadata
-  ) {
+  async #commandExecute(i: CommandInteraction, instance: CommandBase, metadata: CommandMetadata) {
     let method = metadata.methods.find((m) => m.name === DEFAULT_METHOD);
 
     if (i.isChatInputCommand()) {

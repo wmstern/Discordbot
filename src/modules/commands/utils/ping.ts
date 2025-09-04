@@ -1,9 +1,7 @@
 import { Command, Cooldown, Execute } from '#framework';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
-@Command(
-  new SlashCommandBuilder().setName('ping').setDescription('devuelve pong.')
-)
+@Command(new SlashCommandBuilder().setName('ping').setDescription('devuelve pong.'))
 export class PingCommand {
   @Execute()
   @Cooldown(3000)

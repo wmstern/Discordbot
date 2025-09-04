@@ -21,9 +21,7 @@ export class EventHandler {
         if (key === 'constructor') continue;
         if (typeof (Ev.prototype as EventBase)[key] !== 'function') continue;
 
-        const name = Ev[Symbol.metadata]?.[key] as
-          | keyof ClientEvents
-          | undefined;
+        const name = Ev[Symbol.metadata]?.[key] as keyof ClientEvents | undefined;
         if (!name) continue;
         this.events.add(name);
 
