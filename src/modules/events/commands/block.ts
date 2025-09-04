@@ -3,7 +3,7 @@ import { MessageFlags, type CommandInteraction } from 'discord.js';
 
 export class CommandBlockEvent {
   @Event('commandBlock')
-  async onBlock(i: CommandInteraction, { reason, context }: FilterResponse) {
+  async onBlock(i: CommandInteraction, { reason, context }: FilterResponse): Promise<void> {
     const replied = i.replied || i.deferred;
 
     if (reason === 'cooldown') {

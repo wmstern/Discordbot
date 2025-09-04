@@ -22,15 +22,16 @@ const collector = new TTTCollector();
         .setChoices(Object.values(Difficulties).map((v) => ({ name: v, value: v })))
         .setRequired(false)
     )
+    .toJSON()
 )
 export class TTTCommand {
   @Execute()
   @DeferReply(true)
   @Cooldown(12000)
-  async run(i: ChatInputCommandInteraction) {
+  async run(i: ChatInputCommandInteraction): Promise<void> {
     const channel = i.channelId;
 
-    if (manager.hasGame(channel)) {
+    if (manager.games.has(channel)) {
       await i.followUp({
         content: 'Ya hay una partida en el canal.',
         flags: MessageFlags.Ephemeral

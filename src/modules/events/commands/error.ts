@@ -4,7 +4,7 @@ import { logger } from '../../../common/logger.ts';
 
 export class CommandErrorEvents {
   @Event('commandError')
-  async command(i: CommandInteraction, err: Error) {
+  async command(i: CommandInteraction, err: Error): Promise<void> {
     logger.error(err);
 
     const replied = i.replied || i.deferred;
@@ -16,7 +16,7 @@ export class CommandErrorEvents {
   }
 
   @Event('autocompleteError')
-  autocomplete(_i: AutocompleteInteraction, err: Error) {
+  autocomplete(_i: AutocompleteInteraction, err: Error): void {
     logger.error(err);
   }
 }

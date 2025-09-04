@@ -27,7 +27,7 @@ export class CommandHandler {
     this.client.on('interactionCreate', (i) => void this.#interactionCreate(i));
   }
 
-  #getCommandsStructures() {
+  #getCommandsStructures(): void {
     for (const Cmd of this.cmds) {
       if (typeof Cmd !== 'function' || !('prototype' in Cmd)) throw new Error();
 
@@ -50,7 +50,7 @@ export class CommandHandler {
     return metadata;
   }
 
-  async #interactionCreate(i: BaseInteraction) {
+  async #interactionCreate(i: BaseInteraction): Promise<void> {
     if (i.isCommand()) {
       const instance = this.commandMap.get(i.commandName);
       const metadata = this.commandMetadata.get(i.commandName);
@@ -74,7 +74,11 @@ export class CommandHandler {
     }
   }
 
-  async #commandExecute(i: CommandInteraction, instance: CommandBase, metadata: CommandMetadata) {
+  async #commandExecute(
+    i: CommandInteraction,
+    instance: CommandBase,
+    metadata: CommandMetadata
+  ): Promise<void> {
     let method = metadata.methods.find((m) => m.name === DEFAULT_METHOD);
 
     if (i.isChatInputCommand()) {
@@ -132,7 +136,7 @@ export class CommandHandler {
     i: AutocompleteInteraction,
     instance: CommandBase,
     metadata: CommandMetadata
-  ) {
+  ): Promise<void> {
     const autocomplete = metadata.autocomplete;
     if (!autocomplete) return;
 

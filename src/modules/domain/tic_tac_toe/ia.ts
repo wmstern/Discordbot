@@ -1,5 +1,6 @@
-import { Difficulties, BoardCell } from './constants.ts';
+import { BoardCell, Difficulties } from './constants.ts';
 import { GameLogic } from './logic.ts';
+import type { Coor } from './types.ts';
 
 export class GameIA {
   public readonly game: GameLogic;
@@ -10,7 +11,7 @@ export class GameIA {
     this.difficulty = Difficulty;
   }
 
-  move() {
+  move(): Coor | null {
     switch (this.difficulty) {
       case Difficulties.EASY:
         return this.easyMove(this.game);
@@ -21,7 +22,7 @@ export class GameIA {
     }
   }
 
-  easyMove(game: GameLogic) {
+  easyMove(game: GameLogic): Coor | null {
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return null;
     const choice = freeCells[Math.floor(Math.random() * freeCells.length)];
@@ -29,7 +30,7 @@ export class GameIA {
     return choice;
   }
 
-  mediumMove(game: GameLogic) {
+  mediumMove(game: GameLogic): Coor | null {
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return null;
 
@@ -51,7 +52,7 @@ export class GameIA {
     return this.easyMove(game);
   }
 
-  hardMove(game: GameLogic) {
+  hardMove(game: GameLogic): Coor | null {
     const freeCells = game.getFreeCells();
     if (freeCells.length === 0) return null;
 

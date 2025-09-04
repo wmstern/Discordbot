@@ -1,36 +1,26 @@
-import type {
-  Client,
-  ContextMenuCommandBuilder,
-  SlashCommandBuilder,
-  SlashCommandOptionsOnlyBuilder,
-  SlashCommandSubcommandsOnlyBuilder
+import {
+  ApplicationCommandType,
+  type Client,
+  type RESTPostAPIChatInputApplicationCommandsJSONBody,
+  type RESTPostAPIContextMenuApplicationCommandsJSONBody
 } from 'discord.js';
-
-export type SlashCommand =
-  | SlashCommandBuilder
-  | SlashCommandOptionsOnlyBuilder
-  | SlashCommandSubcommandsOnlyBuilder;
-
-export type ContextMenuCommand = ContextMenuCommandBuilder;
-
-export type CommandOptions = SlashCommand | ContextMenuCommandBuilder;
+import type { CommandMetadata } from '../types/command.types.ts';
 
 type CommandConstructor = (new () => object) | (new (client: Client) => object);
+interface Context extends Omit<DecoratorContext, 'metadata'> {
+  metadata: Partial<CommandMetadata>;
+}
 
-export function Command(command: CommandOptions) {
-  const data = command.toJSON();
-  return (_target: CommandConstructor, context: DecoratorContext) => {
+export function Command(
+  command:
+    | RESTPostAPIChatInputApplicationCommandsJSONBody
+    | RESTPostAPIContextMenuApplicationCommandsJSONBody
+) {
+  const data = command;
+  return (_target: CommandConstructor, context: Context) => {
     if (context.kind !== 'class') throw new Error();
     context.metadata.data = data;
-    context.metadata.type = data.type;
+    context.metadata.type = data.type ?? ApplicationCommandType.ChatInput;
     context.metadata.methods ??= [];
   };
-}
-
-export function SlashCommand(command: SlashCommand) {
-  return Command(command);
-}
-
-export function ContextMenuCommand(command: ContextMenuCommand) {
-  return Command(command);
 }

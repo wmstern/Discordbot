@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
 import { BoardCell, Emojis, EndReasons, Turns, type Difficulties } from './constants.ts';
 import { GameIA } from './ia.ts';
-import type { Board, Line, Response } from './types.ts';
+import type { Board, Coor, Line, Response } from './types.ts';
 
 export class GameLogic {
   public readonly player1: User;
@@ -52,8 +52,9 @@ export class GameLogic {
   }
 
   playMove(x: number, y: number): Response {
-    const response: Partial<Response> = {};
-    response.placed = this.placeMarker(x, y);
+    const placed = this.placeMarker(x, y);
+
+    const response: Response = { placed, ended: false };
 
     if (this.checkWin()) response.endReason = EndReasons.WIN;
     else if (this.board.every((row) => row.every((cell) => cell !== BoardCell.NULL)))
@@ -69,9 +70,8 @@ export class GameLogic {
     }
 
     if (response.endReason) response.ended = true;
-    else response.ended = false;
 
-    return response as Response;
+    return response;
   }
 
   placeMarker(x: number, y: number): boolean {
@@ -104,7 +104,7 @@ export class GameLogic {
     return undefined;
   }
 
-  getFreeCells(): { x: number; y: number }[] {
+  getFreeCells(): Coor[] {
     return this.board
       .flatMap((row, y) => row.map((cell, x) => (cell === BoardCell.NULL ? { y, x } : null)))
       .filter((v) => v !== null);

@@ -3,11 +3,13 @@ import { EmbedBuilder, SlashCommandBuilder, type ChatInputCommandInteraction } f
 
 const embed = new EmbedBuilder();
 
-@Command(new SlashCommandBuilder().setName('help').setDescription('Muestra la lista de comandos.'))
+@Command(
+  new SlashCommandBuilder().setName('help').setDescription('Muestra la lista de comandos.').toJSON()
+)
 export class HelpCommand {
   @Execute()
   @Cooldown(6000)
-  async run(i: ChatInputCommandInteraction) {
+  async run(i: ChatInputCommandInteraction): Promise<void> {
     if (!('description' in embed.data)) {
       const commands = await (await i.client.application.fetch()).commands.fetch();
       embed.setDescription('```\n' + commands.map((cmd) => `/${cmd.name}`).join('\n') + '\n```');

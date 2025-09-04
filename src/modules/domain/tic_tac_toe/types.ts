@@ -9,3 +9,8 @@ export interface Response {
   ended: boolean;
   endReason?: EndReasons;
 }
+
+export interface Coor {
+  y: number;
+  x: number;
+}

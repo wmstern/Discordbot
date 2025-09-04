@@ -11,7 +11,7 @@ export class EventHandler {
     this.#getEventsStructures();
   }
 
-  #getEventsStructures() {
+  #getEventsStructures(): void {
     for (const Ev of this.evs) {
       if (typeof Ev !== 'function' || !('prototype' in Ev)) continue;
 

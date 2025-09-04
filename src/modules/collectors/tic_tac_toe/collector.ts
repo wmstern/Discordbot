@@ -1,6 +1,7 @@
 import {
   ComponentType,
   type ButtonInteraction,
+  type InteractionCollector,
   type Message,
   type ReadonlyCollection
 } from 'discord.js';
@@ -9,7 +10,11 @@ import type { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
 import type { GameManager } from '../../services/games/manager.ts';
 
 export class TTTCollector {
-  create(msg: Message, game: GameLogic, games: GameManager<typeof GameLogic>) {
+  create(
+    msg: Message,
+    game: GameLogic,
+    games: GameManager<typeof GameLogic>
+  ): InteractionCollector<ButtonInteraction> {
     const collector = msg.createMessageComponentCollector({
       idle: 180_000,
       componentType: ComponentType.Button
@@ -66,5 +71,7 @@ export class TTTCollector {
 
     collector.on('collect', (i) => void handleCollect(i));
     collector.on('end', (collected, reason) => void handleEnd(collected, reason));
+
+    return collector;
   }
 }
