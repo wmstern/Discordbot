@@ -28,6 +28,12 @@ export default defineConfig([
         {
           allowWithDecorator: true
         }
+      ],
+      '@typescript-eslint/no-explicit-any': [
+        'error',
+        {
+          ignoreRestArgs: true
+        }
       ]
     }
   }

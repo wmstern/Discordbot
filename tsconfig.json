@@ -34,6 +34,6 @@
     "target": "esnext",
     "useDefineForClassFields": true
   },
-  "include": ["**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "__tests__"]
 }
