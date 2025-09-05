@@ -7,7 +7,9 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody
 } from 'discord.js';
 
-export type InteractionMethod<I extends BaseInteraction, R = unknown> = (i: I) => R;
+export type Func<T extends unknown[], R> = (...arg: T) => R;
+
+export type InteractionMethod<I extends BaseInteraction> = Func<[I], unknown>;
 export type AutocompleteMethod = InteractionMethod<AutocompleteInteraction>;
 export type CommandMethod<I extends CommandInteraction = CommandInteraction> = InteractionMethod<I>;
 
@@ -16,10 +18,9 @@ export interface FilterResponse {
   reason?: string;
   context?: unknown;
 }
-export type FilterFunc<I extends CommandInteraction = CommandInteraction> = InteractionMethod<
-  I,
-  (boolean | FilterResponse) | Promise<boolean | FilterResponse>
->;
+
+export type FilterReturns = boolean | FilterResponse | Promise<boolean> | Promise<FilterReturns>;
+export type FilterFunc<I extends CommandInteraction = CommandInteraction> = Func<[I], FilterReturns>;
 
 export interface CommandAutocompleteMetadata {
   methodName: string;

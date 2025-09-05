@@ -10,11 +10,7 @@ import type { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
 import type { GameManager } from '../../services/games/manager.ts';
 
 export class TTTCollector {
-  create(
-    msg: Message,
-    game: GameLogic,
-    games: GameManager<typeof GameLogic>
-  ): InteractionCollector<ButtonInteraction> {
+  create(msg: Message, game: GameLogic, games: GameManager<typeof GameLogic>): InteractionCollector<ButtonInteraction> {
     const collector = msg.createMessageComponentCollector({
       idle: 180_000,
       componentType: ComponentType.Button
@@ -44,10 +40,7 @@ export class TTTCollector {
       });
     };
 
-    const handleEnd = async (
-      collected: ReadonlyCollection<string, ButtonInteraction>,
-      reason: string
-    ) => {
+    const handleEnd = async (collected: ReadonlyCollection<string, ButtonInteraction>, reason: string) => {
       games.removeGame(msg.channelId);
 
       const i = collected.last();

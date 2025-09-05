@@ -1,9 +1,4 @@
-import type {
-  AutocompleteInteraction,
-  BaseInteraction,
-  Client,
-  CommandInteraction
-} from 'discord.js';
+import type { AutocompleteInteraction, BaseInteraction, Client, CommandInteraction } from 'discord.js';
 import { DEFAULT_METHOD } from '../decorators/command_method.ts';
 import type { CommandStore } from '../stores/command_store.ts';
 import type { CommandMethodMetadata, CooldownObject } from '../types/command.types.ts';
@@ -104,10 +99,7 @@ export class CommandExecutor {
     return true;
   }
 
-  async #filters(
-    interaction: CommandInteraction,
-    metadata: CommandMethodMetadata
-  ): Promise<boolean> {
+  async #filters(interaction: CommandInteraction, metadata: CommandMethodMetadata): Promise<boolean> {
     if (!metadata.filters) return true;
 
     for (const filter of metadata.filters) {

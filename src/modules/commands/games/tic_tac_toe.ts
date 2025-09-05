@@ -12,9 +12,7 @@ const collector = new TTTCollector();
   new SlashCommandBuilder()
     .setName('tic_tac_toe')
     .setDescription('El clasico juego tic tac toe.')
-    .addUserOption((opt) =>
-      opt.setName('adversario').setDescription('El segundo jugador.').setRequired(false)
-    )
+    .addUserOption((opt) => opt.setName('adversario').setDescription('El segundo jugador.').setRequired(false))
     .addStringOption((opt) =>
       opt
         .setName('dificultad')
@@ -41,8 +39,7 @@ export class TTTCommand {
 
     const player1 = i.user;
     const player2 = i.options.getUser('adversario', false) ?? i.client.user;
-    const difficulty =
-      (i.options.getString('dificultad', false) as Difficulties | null) ?? Difficulties.MEDIUM;
+    const difficulty = (i.options.getString('dificultad', false) as Difficulties | null) ?? Difficulties.MEDIUM;
 
     const game = new GameLogic(player1, player2, difficulty);
 

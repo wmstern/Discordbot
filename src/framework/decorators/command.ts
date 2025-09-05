@@ -12,9 +12,7 @@ interface Context extends Omit<DecoratorContext, 'metadata'> {
 }
 
 export function Command(
-  command:
-    | RESTPostAPIChatInputApplicationCommandsJSONBody
-    | RESTPostAPIContextMenuApplicationCommandsJSONBody
+  command: RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody
 ) {
   const data = command;
   return (_target: CommandConstructor, context: Context) => {

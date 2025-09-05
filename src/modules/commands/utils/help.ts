@@ -3,9 +3,7 @@ import { EmbedBuilder, SlashCommandBuilder, type ChatInputCommandInteraction } f
 
 const embed = new EmbedBuilder();
 
-@Command(
-  new SlashCommandBuilder().setName('help').setDescription('Muestra la lista de comandos.').toJSON()
-)
+@Command(new SlashCommandBuilder().setName('help').setDescription('Muestra la lista de comandos.').toJSON())
 export class HelpCommand {
   @Execute()
   @Cooldown(6000)

@@ -85,10 +85,7 @@ function getMethods(context: Context): CommandMethodMetadata[] | undefined {
   return methods;
 }
 
-function ensureMethod(
-  methods: CommandMethodMetadata[],
-  methodName: string
-): CommandMethodMetadata | undefined {
+function ensureMethod(methods: CommandMethodMetadata[], methodName: string): CommandMethodMetadata | undefined {
   let method = methods.find((m) => m.methodName === methodName);
   if (!method) methods.push({ methodName, name: methodName });
   method = methods.find((m) => m.methodName === methodName);
