@@ -12,7 +12,7 @@ try {
       repliedUser: false
     }
   });
-  app.listen(config.env.discordBotToken, config.env.discordClientId);
+  app.listen(config.env.discordBotToken);
 } catch (err) {
   logger.error(err);
   process.exit(1);

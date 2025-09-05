@@ -36,6 +36,7 @@ export interface CommandMethodMetadata {
 export interface CommandMetadata {
   data: RESTPostAPIApplicationCommandsJSONBody;
   type: ApplicationCommandType;
+  guild?: string;
   autocomplete?: CommandAutocompleteMetadata;
   methods: CommandMethodMetadata[];
 }

@@ -1,9 +1,14 @@
 import type { ClientEvents } from 'discord.js';
-import type { EventMethod } from '../types/event.types.ts';
+import type { EventMetadata, EventMethod } from '../types/event.types.ts';
+
+interface Context extends Omit<DecoratorContext, 'metadata'> {
+  metadata: Partial<EventMetadata>;
+}
 
 export function Event<T extends keyof ClientEvents>(name: T) {
-  return (_target: EventMethod<T>, context: DecoratorContext) => {
+  return (_target: EventMethod<T>, context: Context) => {
     if (context.kind !== 'method' || typeof context.name !== 'string') throw new Error();
-    context.metadata[context.name] = name;
+    context.metadata.methods ??= {};
+    context.metadata.methods[context.name] = name;
   };
 }
