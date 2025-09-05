@@ -21,6 +21,6 @@ export function Command(
     if (context.kind !== 'class') throw new Error();
     context.metadata.data = data;
     context.metadata.type = data.type ?? ApplicationCommandType.ChatInput;
-    context.metadata.methods ??= [];
+    if (!Array.isArray(context.metadata.methods)) context.metadata.methods = [];
   };
 }

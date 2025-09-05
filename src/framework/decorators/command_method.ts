@@ -3,8 +3,8 @@ import type {
   AutocompleteMethod,
   CommandMetadata,
   CommandMethod,
-  CommandMethodFilter,
-  CommandMethodMetadata
+  CommandMethodMetadata,
+  FilterFunc
 } from '../types/command.types.ts';
 
 export const DEFAULT_METHOD = '/';
@@ -53,7 +53,7 @@ export function DeferReply(defer = true) {
   };
 }
 
-export function Filters<F extends CommandInteraction>(...filters: CommandMethodFilter<F>[]) {
+export function Filters<F extends CommandInteraction>(...filters: FilterFunc<F>[]) {
   return <T extends CommandInteraction>(_target: CommandMethod<T>, context: Context) => {
     if (context.kind !== 'method' || typeof context.name !== 'string') throw new Error();
 
@@ -62,7 +62,7 @@ export function Filters<F extends CommandInteraction>(...filters: CommandMethodF
 
     const method = ensureMethod(methods, context.name);
     if (method) {
-      method.filters = [...(method.filters ?? []), ...(filters as CommandMethodFilter[])];
+      method.filters = [...(method.filters ?? []), ...(filters as FilterFunc[])];
     }
   };
 }
@@ -79,18 +79,18 @@ export function Autocomplete() {
   };
 }
 
-function getMethods(context: Context): Partial<CommandMethodMetadata>[] | undefined {
-  context.metadata.methods ??= [];
-  const methods = context.metadata.methods as Partial<CommandMethodMetadata>[];
+function getMethods(context: Context): CommandMethodMetadata[] | undefined {
+  if (!Array.isArray(context.metadata.methods)) context.metadata.methods = [];
+  const methods = context.metadata.methods;
   return methods;
 }
 
 function ensureMethod(
-  methods: Partial<CommandMethodMetadata>[],
+  methods: CommandMethodMetadata[],
   methodName: string
-): Partial<CommandMethodMetadata> | undefined {
+): CommandMethodMetadata | undefined {
   let method = methods.find((m) => m.methodName === methodName);
-  if (!method) methods.push({ methodName });
+  if (!method) methods.push({ methodName, name: methodName });
   method = methods.find((m) => m.methodName === methodName);
   return method;
 }

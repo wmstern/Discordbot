@@ -6,22 +6,20 @@ import {
 } from 'discord.js';
 import { DEFAULT_METHOD } from '../decorators/command_method.ts';
 import type {
-  CommandBase,
-  CommandConstructor,
+  CommandClass,
+  CommandEntry,
   CommandMetadata,
   CooldownObject
 } from '../types/command.types.ts';
 import { isAutocomplete, isCommandMethod } from '../utils/command_helpers.ts';
 
 export class CommandHandler {
-  public readonly commandMap = new Map<string, CommandBase>();
-  public readonly commandMetadata = new Map<string, CommandMetadata>();
-
+  public readonly commands = new Map<string, CommandEntry>();
   public readonly cooldowns = new Map<string, Map<string, CooldownObject>>();
 
   constructor(
     protected readonly client: Client,
-    private readonly cmds: CommandConstructor[]
+    private readonly cmds: CommandClass[]
   ) {
     this.#getCommandsStructures();
     this.client.on('interactionCreate', (i) => void this.#interactionCreate(i));
@@ -35,12 +33,11 @@ export class CommandHandler {
       if (!metadata) continue;
 
       const instance = new Cmd(Cmd.length === 1 ? this.client : undefined);
-      this.commandMap.set(metadata.data.name, instance);
-      this.commandMetadata.set(metadata.data.name, metadata);
+      this.commands.set(metadata.data.name, { instance, metadata });
     }
   }
 
-  #getCommandMetadata(Command: CommandConstructor): CommandMetadata | undefined {
+  #getCommandMetadata(Command: CommandClass): CommandMetadata | undefined {
     const metadata = Command[Symbol.metadata];
     if (!metadata?.data) return;
 
@@ -52,32 +49,29 @@ export class CommandHandler {
 
   async #interactionCreate(i: BaseInteraction): Promise<void> {
     if (i.isCommand()) {
-      const instance = this.commandMap.get(i.commandName);
-      const metadata = this.commandMetadata.get(i.commandName);
-      if (!instance || !metadata) return;
+      const command = this.commands.get(i.commandName);
+      if (!command) return;
 
       try {
-        await this.#commandExecute(i, instance, metadata);
+        await this.#commandExecute(i, command);
       } catch (err) {
-        i.client.emit('commandError', i, err as Error, metadata);
+        i.client.emit('commandError', i, err as Error, command);
       }
     } else if (i.isAutocomplete()) {
-      const instance = this.commandMap.get(i.commandName);
-      const metadata = this.commandMetadata.get(i.commandName);
-      if (!instance || !metadata) return;
+      const command = this.commands.get(i.commandName);
+      if (!command) return;
 
       try {
-        await this.#autocompleteExecute(i, instance, metadata);
+        await this.#autocompleteExecute(i, command);
       } catch (err) {
-        i.client.emit('autocompleteError', i, err as Error, metadata);
+        i.client.emit('autocompleteError', i, err as Error, command);
       }
     }
   }
 
   async #commandExecute(
     i: CommandInteraction,
-    instance: CommandBase,
-    metadata: CommandMetadata
+    { instance, metadata }: CommandEntry
   ): Promise<void> {
     let method = metadata.methods.find((m) => m.name === DEFAULT_METHOD);
 
@@ -101,13 +95,13 @@ export class CommandHandler {
         reason: 'cooldown',
         context: cooldowns.get(i.user.id)
       };
-      i.client.emit('commandBlock', i, response, metadata);
+      i.client.emit('commandBlock', i, response, { instance, metadata });
       return;
     }
 
     if (method.defer) await i.deferReply();
 
-    for (const filter of method.filters) {
+    for (const filter of method.filters ?? []) {
       let response = await filter(i);
 
       if (typeof response === 'boolean') {
@@ -115,7 +109,7 @@ export class CommandHandler {
       }
 
       if (response.block) {
-        i.client.emit('commandBlock', i, response, metadata);
+        i.client.emit('commandBlock', i, response, { instance, metadata });
         return;
       }
     }
@@ -134,8 +128,7 @@ export class CommandHandler {
 
   async #autocompleteExecute(
     i: AutocompleteInteraction,
-    instance: CommandBase,
-    metadata: CommandMetadata
+    { instance, metadata }: CommandEntry
   ): Promise<void> {
     const autocomplete = metadata.autocomplete;
     if (!autocomplete) return;
