@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { CommandHandler } from '../handlers/command_handler.ts';
 import { EventHandler } from '../handlers/event_handler.ts';
 import type { CommandClass } from '../types/command.types.ts';
-import type { EventConstructor } from '../types/event.types.ts';
+import type { EventClass } from '../types/event.types.ts';
 import { getExports } from '../utils/files.ts';
 
 export const FrameworkFactory = {
@@ -12,7 +12,7 @@ export const FrameworkFactory = {
     const client = new Client(options);
 
     const commands = await getExports<CommandClass>(join(path, 'commands'));
-    const events = await getExports<EventConstructor>(join(path, 'events'));
+    const events = await getExports<EventClass>(join(path, 'events'));
 
     const commandHandler = new CommandHandler(client, commands);
     const eventHandler = new EventHandler(client, events);

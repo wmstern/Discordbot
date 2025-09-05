@@ -49,7 +49,7 @@ export interface CommandClass {
 
 export interface CommandEntry {
   instance: CommandInstance;
-  metadata: CommandMetadata;
+  metadata: Readonly<CommandMetadata>;
 }
 
 export interface CooldownObject {

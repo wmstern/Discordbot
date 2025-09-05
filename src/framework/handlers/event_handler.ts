@@ -1,12 +1,12 @@
 import { type Client, type ClientEvents } from 'discord.js';
-import type { EventBase, EventConstructor } from '../types/event.types.ts';
+import type { EventClass } from '../types/event.types.ts';
 
 export class EventHandler {
   public readonly events = new Set<keyof ClientEvents>();
 
   constructor(
     protected readonly client: Client,
-    private evs: EventConstructor[]
+    private evs: EventClass[]
   ) {
     this.#getEventsStructures();
   }
@@ -19,9 +19,9 @@ export class EventHandler {
 
       for (const key of Object.getOwnPropertyNames(Ev.prototype)) {
         if (key === 'constructor') continue;
-        if (typeof (Ev.prototype as EventBase)[key] !== 'function') continue;
+        if (typeof instance[key] !== 'function') continue;
 
-        const name = Ev[Symbol.metadata]?.[key] as keyof ClientEvents | undefined;
+        const name = Ev[Symbol.metadata][key];
         if (!name) continue;
         this.events.add(name);
 
