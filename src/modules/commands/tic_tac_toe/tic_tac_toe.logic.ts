@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, type User } from 'discord.js';
-import { BoardCell, Emojis, EndReasons, Turns, type Difficulties } from './constants.ts';
-import { GameIA } from './ia.ts';
-import type { Board, Coor, Line, Response } from './types.ts';
+import type { Board, Coor, Line, Response } from './tic_tac_toe.types.ts';
+import { BoardCell, Emojis, EndReasons, Turns, type Difficulties } from './tic_tac_toe.constants.ts';
+import { GameIA } from './tic_tac_toe.ai.ts';
 
 export class GameLogic {
   public readonly player1: User;

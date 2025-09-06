@@ -2,7 +2,7 @@ import { Event } from '#framework';
 import type { Client } from 'discord.js';
 import { logger } from '../../common/logger.ts';
 
-export class ClientEvents {
+export class BasicEvents {
   @Event('ready')
   async ready(client: Client): Promise<void> {
     const app = await client.application?.fetch();

@@ -1,9 +1,9 @@
 import { Command, Cooldown, DeferReply, Execute } from '#framework';
 import { MessageFlags, SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
-import { TTTCollector } from '../../collectors/tic_tac_toe/collector.ts';
-import { Difficulties } from '../../domain/tic_tac_toe/constants.ts';
-import { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
-import { GameManager } from '../../services/games/manager.ts';
+import { GameManager } from '../../games/games.service.ts';
+import { TTTCollector } from './tic_tac_toe.collector.ts';
+import { Difficulties } from './tic_tac_toe.constants.ts';
+import { GameLogic } from './tic_tac_toe.logic.ts';
 
 const manager = new GameManager(GameLogic);
 const collector = new TTTCollector();

@@ -5,9 +5,9 @@ import {
   type Message,
   type ReadonlyCollection
 } from 'discord.js';
-import { EndReasons } from '../../domain/tic_tac_toe/constants.ts';
-import type { GameLogic } from '../../domain/tic_tac_toe/logic.ts';
-import type { GameManager } from '../../services/games/manager.ts';
+import type { GameManager } from '../../games/games.service.ts';
+import { EndReasons } from './tic_tac_toe.constants.ts';
+import type { GameLogic } from './tic_tac_toe.logic.ts';
 
 export class TTTCollector {
   create(msg: Message, game: GameLogic, games: GameManager<typeof GameLogic>): InteractionCollector<ButtonInteraction> {

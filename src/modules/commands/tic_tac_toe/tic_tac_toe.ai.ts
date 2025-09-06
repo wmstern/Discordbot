@@ -1,6 +1,6 @@
-import { BoardCell, Difficulties } from './constants.ts';
-import { GameLogic } from './logic.ts';
-import type { Coor } from './types.ts';
+import { BoardCell, Difficulties } from './tic_tac_toe.constants.ts';
+import { GameLogic } from './tic_tac_toe.logic.ts';
+import type { Coor } from './tic_tac_toe.types.ts';
 
 export class GameIA {
   public readonly game: GameLogic;

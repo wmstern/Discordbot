@@ -1,6 +1,6 @@
 import { Event } from '#framework';
 import { MessageFlags, type AutocompleteInteraction, type CommandInteraction } from 'discord.js';
-import { logger } from '../../../common/logger.ts';
+import { logger } from '../../common/logger.ts';
 
 export class CommandErrorEvents {
   @Event('commandError')

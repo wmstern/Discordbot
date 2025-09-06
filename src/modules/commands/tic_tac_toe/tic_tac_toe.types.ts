@@ -1,4 +1,4 @@
-import type { BoardCell, EndReasons } from './constants.ts';
+import type { BoardCell, EndReasons } from './tic_tac_toe.constants.ts';
 
 export type Board = [Line, Line, Line];
 export type Cell = BoardCell;

@@ -1,6 +1,5 @@
 import 'core-js/proposals/decorator-metadata-v2';
 import { Client, ClientOptions } from 'discord.js';
-import { join } from 'node:path';
 import { CommandDeployer } from '../services/command_deployer.ts';
 import { CommandExecutor } from '../services/command_executor.ts';
 import { EventDispatcher } from '../services/event_dispatcher.ts';
@@ -8,14 +7,44 @@ import { CommandStore } from '../stores/command_store.ts';
 import { EventStore } from '../stores/event_store.ts';
 import type { CommandClass } from '../types/command.types.ts';
 import type { EventClass } from '../types/event.types.ts';
-import { getExports } from '../utils/files.ts';
+import { getCommands, getEvents } from '../utils/files.ts';
+
+interface BaseConfig {
+  client: ClientOptions;
+}
+
+interface DynamicConfig extends BaseConfig {
+  mode: 'dynamic';
+  path: string;
+}
+
+interface ModuleConfig extends BaseConfig {
+  mode: 'module';
+  module: Module;
+}
+
+export type Config = DynamicConfig | ModuleConfig;
+
+export interface Module {
+  commands?: CommandClass[];
+  events?: EventClass[];
+  imports?: Module[];
+}
 
 export const FrameworkFactory = {
-  async create(path: string, options: ClientOptions): Promise<App> {
-    const client = new Client(options);
+  async create(config: Config): Promise<App> {
+    const client = new Client(config.client);
 
-    const commands = await getExports<CommandClass>(join(path, 'commands'));
-    const events = await getExports<EventClass>(join(path, 'events'));
+    const commands: CommandClass[] = [];
+    const events: EventClass[] = [];
+
+    if (config.mode === 'dynamic') {
+      commands.push(...(await getCommands(config.path)));
+      events.push(...(await getEvents(config.path)));
+    } else {
+      commands.push(...(config.module.commands ?? []));
+      events.push(...(config.module.events ?? []));
+    }
 
     const commandStore = new CommandStore();
     const eventStore = new EventStore();
@@ -39,5 +68,5 @@ export const FrameworkFactory = {
 
 interface App {
   client: Client;
-  listen(token: string): void;
+  listen(token: string): Promise<void>;
 }

@@ -1,4 +1,4 @@
-import type { GameLogic as TTT } from '../../domain/tic_tac_toe/logic.ts';
+import type { GameLogic as TTT } from '../commands/tic_tac_toe/tic_tac_toe.logic.ts';
 
 type Instance = TTT;
 type Constructor = typeof TTT;
